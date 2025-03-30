@@ -1,0 +1,147 @@
+<nav class="w-full bg-slate-900 py-4">
+  <ul class="flex justify-between items-center w-[95%] max-w-auto mx-auto">
+    <li [routerLinkActive]="['text-red-500']">
+      <a
+        class="flex items-center justify-center p-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+        [routerLink]="['/']"
+        routerLinkActive
+        #home="routerLinkActive"
+      >
+        <svg class="w-8 h-7" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="m26.463.408 3.2 6.4h-4.8l-3.2-6.4h-3.2l3.2 6.4h-4.8l-3.2-6.4h-3.2l3.2 6.4h-4.8l-3.2-6.4h-1.6a3.186 3.186 0 0 0-3.184 3.2l-.016 19.2a3.2 3.2 0 0 0 3.2 3.2h25.6a3.2 3.2 0 0 0 3.2-3.2V.408h-6.4Z"
+            fill="#FC4747"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <li [routerLinkActive]="['text-red-500']">
+      <a
+        class="flex items-center justify-center p-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+        [routerLink]="['/trending']"
+        routerLinkActive
+        #trending="routerLinkActive"
+      >
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path
+            *ngIf="trending.isActive"
+            d="M8 0H1C.4 0 0 .4 0 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1Zm0 11H1c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1v-7c0-.6-.4-1-1-1ZM19 0h-7c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1Zm0 11h-7c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1v-7c0-.6-.4-1-1-1Z"
+            fill="currentColor"
+          />
+          <path
+            *ngIf="!trending.isActive"
+            d="M8 0H1C.4 0 0 .4 0 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1Zm0 11H1c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1v-7c0-.6-.4-1-1-1ZM19 0h-7c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1Zm0 11h-7c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h7c.6 0 1-.4 1-1v-7c0-.6-.4-1-1-1Z"
+            fill="currentColor"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <li [routerLinkActive]="['text-red-500']">
+      <a
+        class="flex items-center justify-center p-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+        [routerLink]="['/movies']"
+        routerLinkActive
+        #movies="routerLinkActive"
+      >
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path
+            *ngIf="movies.isActive"
+            d="M16.956 0H3.044A3.044 3.044 0 0 0 0 3.044v13.912A3.044 3.044 0 0 0 3.044 20h13.912A3.044 3.044 0 0 0 20 16.956V3.044A3.044 3.044 0 0 0 16.956 0ZM4 9H2V7h2v2Zm-2 2h2v2H2v-2Zm16-2h-2V7h2v2Zm-2 2h2v2h-2v-2Zm2-8.26V4h-2V2h1.26a.74.74 0 0 1 .74.74ZM2.74 2H4v2H2V2.74A.74.74 0 0 1 2.74 2ZM2 17.26V16h2v2H2.74a.74.74 0 0 1-.74-.74Zm16 0a.74.74 0 0 1-.74.74H16v-2h2v1.26Z"
+            fill="currentColor"
+          />
+          <path
+            *ngIf="!movies.isActive"
+            d="M16.956 0H3.044A3.044 3.044 0 0 0 0 3.044v13.912A3.044 3.044 0 0 0 3.044 20h13.912A3.044 3.044 0 0 0 20 16.956V3.044A3.044 3.044 0 0 0 16.956 0ZM4 9H2V7h2v2Zm-2 2h2v2H2v-2Zm16-2h-2V7h2v2Zm-2 2h2v2h-2v-2Zm2-8.26V4h-2V2h1.26a.74.74 0 0 1 .74.74ZM2.74 2H4v2H2V2.74A.74.74 0 0 1 2.74 2ZM2 17.26V16h2v2H2.74a.74.74 0 0 1-.74-.74Zm16 0a.74.74 0 0 1-.74.74H16v-2h2v1.26Z"
+            fill="currentColor"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <li [routerLinkActive]="['text-red-500']">
+      <a
+        class="flex items-center justify-center p-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+        [routerLink]="['/tv-shows']"
+        routerLinkActive
+        #tvshows="routerLinkActive"
+      >
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path
+            *ngIf="tvshows.isActive"
+            d="M20 4.481H9.08l2.7-3.278L10.22 0 7 3.909 3.78.029 2.22 1.203l2.7 3.278H0V20h20V4.481Zm-8 13.58H2V6.42h10v11.64Zm5-3.88h-2v-1.94h2v1.94Zm0-3.88h-2V8.36h2v1.94Z"
+            fill="currentColor"
+          />
+          <path
+            *ngIf="!tvshows.isActive"
+            d="M20 4.481H9.08l2.7-3.278L10.22 0 7 3.909 3.78.029 2.22 1.203l2.7 3.278H0V20h20V4.481Zm-8 13.58H2V6.42h10v11.64Zm5-3.88h-2v-1.94h2v1.94Zm0-3.88h-2V8.36h2v1.94Z"
+            fill="currentColor"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <li [routerLinkActive]="['text-red-500']" *ngIf="authService.isLoggedIn()">
+      <a
+        class="flex items-center justify-center p-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+        [routerLink]="['/bookmark']"
+        routerLinkActive
+        #bookmarks="routerLinkActive"
+      >
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path
+            *ngIf="bookmarks.isActive"
+            d="M15.387 17.944l-5.387-3.422-5.387 3.422V2h10.774v15.944z"
+            fill="currentColor"
+          />
+          <path
+            *ngIf="!bookmarks.isActive"
+            d="M15.387 17.944l-5.387-3.422-5.387 3.422V2h10.774v15.944z"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <div class="flex items-center space-x-4">
+      <ng-container *ngIf="!authService.isLoggedIn()">
+        <li [routerLinkActive]="['text-red-500']">
+          <a
+            class="flex items-center justify-center px-4 py-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+            [routerLink]="['/register']"
+            routerLinkActive
+            #registration="routerLinkActive"
+          >
+            Register
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['text-red-500']">
+          <a
+            class="flex items-center justify-center px-4 py-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+            [routerLink]="['/login']"
+            routerLinkActive
+            #login="routerLinkActive"
+          >
+            Login
+          </a>
+        </li>
+      </ng-container>
+
+      <li class="mr-4" *ngIf="authService.isLoggedIn()">
+        <a
+          class="flex items-center justify-center px-4 py-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
+          (click)="authService.logout().subscribe()"
+          style="cursor: pointer"
+        >
+          Logout
+        </a>
+      </li>
+    </div>
+  </ul>
+</nav>

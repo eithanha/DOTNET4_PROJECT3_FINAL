@@ -1,0 +1,27 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-white mb-8">Movies</h1>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center items-center min-h-[400px]">
+    <div
+      class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"
+    ></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="text-red-500 text-center py-8">
+    {{ error }}
+  </div>
+
+  <!-- Movies grid -->
+  <div
+    *ngIf="!loading && !error"
+    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+  >
+    <app-show-card
+      *ngFor="let movie of movies"
+      [show]="movie"
+      (watchlistToggle)="onWatchlistToggle($event)"
+    ></app-show-card>
+  </div>
+</div>
