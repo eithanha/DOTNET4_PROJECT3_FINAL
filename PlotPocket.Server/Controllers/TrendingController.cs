@@ -86,5 +86,24 @@ namespace PlotPocket.Server.Controllers
                 return StatusCode(500, $"Error fetching trending TV shows: {ex.Message}");
             }
         }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<ShowDto>>> SearchShows([FromQuery] string query)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    return BadRequest("Search query cannot be empty");
+                }
+
+                var results = await _showService.SearchShows(query);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error searching shows: {ex.Message}");
+            }
+        }
     }
 }

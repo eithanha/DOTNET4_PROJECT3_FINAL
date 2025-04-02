@@ -16,6 +16,7 @@ public class ShowDto
 
     public bool IsWatchlisted { get; set; }
     public bool IsWatched { get; set; }
+    public bool IsBookmarked { get; set; }
 }
 
 public enum ShowType

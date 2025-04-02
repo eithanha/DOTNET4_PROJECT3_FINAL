@@ -7,10 +7,13 @@ export interface ShowDto {
   id: number;
   title: string;
   overview: string;
-  posterPath: string;
+  PosterPath?: string;
+  posterPath?: string;
   rating: number;
-  releaseDate?: Date;
+  ReleaseDate?: Date;
   type: ShowType;
   isWatchlisted: boolean;
+  isInWatchlist: boolean;
   isWatched: boolean;
+  isBookmarked: boolean;
 }

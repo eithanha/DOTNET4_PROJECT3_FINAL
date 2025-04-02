@@ -1,1 +1,83 @@
-<p>tv-shows works!</p>
+<div class="min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-center">
+      <h1 class="text-3xl font-bold text-black mb-8">TV Shows</h1>
+    </div>
+
+    <div class="mb-6">
+      <div class="relative">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()"
+          placeholder="Search TV shows..."
+          class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg
+            class="w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center mb-8 space-x-4">
+      <button
+        (click)="onFilterChange('popular')"
+        [class.bg-blue-600]="selectedFilter === 'popular'"
+        [class.bg-slate-700]="selectedFilter !== 'popular'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
+      >
+        Popular
+      </button>
+      <button
+        (click)="onFilterChange('on-air')"
+        [class.bg-blue-600]="selectedFilter === 'on-air'"
+        [class.bg-slate-700]="selectedFilter !== 'on-air'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
+      >
+        On Air
+      </button>
+      <button
+        (click)="onFilterChange('top-rated')"
+        [class.bg-blue-600]="selectedFilter === 'top-rated'"
+        [class.bg-slate-700]="selectedFilter !== 'top-rated'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
+      >
+        Top Rated
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center min-h-[400px]">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"
+      ></div>
+    </div>
+
+    <div *ngIf="error" class="text-red-500 text-center py-8">
+      {{ error }}
+    </div>
+
+    <div
+      *ngIf="!loading && !error"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+    >
+      <app-show-card
+        *ngFor="let show of tvShows"
+        [show]="show"
+        (watchlistToggle)="onWatchlistToggle($event)"
+        (bookmarkToggle)="onBookmarkToggle($event)"
+      ></app-show-card>
+    </div>
+  </div>
+</div>

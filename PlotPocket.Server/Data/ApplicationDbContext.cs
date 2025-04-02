@@ -12,6 +12,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     }
 
     public DbSet<Show> Shows { get; set; }
+    public DbSet<Bookmark> Bookmarks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -19,6 +20,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
         builder.Entity<Show>()
             .HasMany(s => s.Users)
-            .WithMany(u => u.Shows);
+            .WithMany(u => u.Shows)
+            .UsingEntity(j => j.ToTable("UserShows"));
+
+        builder.Entity<Bookmark>()
+            .HasKey(b => b.Id);
+
+        builder.Entity<Bookmark>()
+            .HasIndex(b => new { b.ShowId, b.UserId })
+            .IsUnique();
     }
 }

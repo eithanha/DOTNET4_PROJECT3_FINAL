@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using PlotPocket.Server.Models;
 
 namespace PlotPocket.Server.Controllers
@@ -26,7 +27,7 @@ namespace PlotPocket.Server.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register([FromBody] EmailLoginDetails details)
         {
-            // Create User instance
+            
             var user = new User
             {
                 UserName = details.Email,
@@ -35,7 +36,7 @@ namespace PlotPocket.Server.Controllers
                 UpdatedAt = DateTime.UtcNow
             };
 
-            // Create the user
+            
             var result = await _userManager.CreateAsync(user, details.Password);
 
             if (!result.Succeeded)
@@ -43,7 +44,10 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest(result.Errors.First().Description);
             }
 
-            // Don't send sensitive data back to the client
+            
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+           
             user.PasswordHash = null;
             return Ok(user);
         }
@@ -52,18 +56,23 @@ namespace PlotPocket.Server.Controllers
         [HttpGet("test")]
         public async Task<ActionResult> Test()
         {
-            /**
-                Simple endpoint that can be used to see if your 
-                authenitcation system is working.
-            */
-            return Ok(new { message = "hello" });
+            try
+            {
+                
+                var userCount = await _userManager.Users.CountAsync();
+                return Ok(new { message = "Connection test successful", userCount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Connection test failed", message = ex.Message });
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] EmailLoginDetails details)
         {
-            // Retrieve user
+            
             var user = await _userManager.FindByEmailAsync(details.Email);
 
             if (user == null)
@@ -71,7 +80,7 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest("Invalid email or password");
             }
 
-            // Check if the password is correct & attempt to sign in
+            
             var result = await _signInManager.PasswordSignInAsync(user, details.Password, false, false);
 
             if (!result.Succeeded)
@@ -79,7 +88,7 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest("Invalid email or password");
             }
 
-            // Don't send sensitive data back to the client
+           
             user.PasswordHash = null;
             return Ok(user);
         }
@@ -89,6 +98,25 @@ namespace PlotPocket.Server.Controllers
         {
             await _signInManager.SignOutAsync();
             return Ok();
+        }
+
+        [HttpGet("status")]
+        public async Task<ActionResult<User>> GetAuthStatus()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            
+            user.PasswordHash = null;
+            return Ok(user);
         }
     }
 }

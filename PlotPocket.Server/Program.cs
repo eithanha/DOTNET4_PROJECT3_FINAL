@@ -40,6 +40,17 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.None;
 });
 
+// Configure session cookies
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.Name = ".plotpocket.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 // Add API controllers
 builder.Services.AddControllers();
 
@@ -62,18 +73,7 @@ builder.Services.AddCors(options =>
 // Add distributed memory cache for session support
 builder.Services.AddDistributedMemoryCache();
 
-// Use sessions for user authorization
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromHours(1);
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.Name = ".plotpocket.Session";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
-
-builder.Services.AddSingleton<TMDBService>();
+builder.Services.AddSingleton<ITmdbService, TMDBService>();
 builder.Services.AddScoped<ShowService>();
 
 var app = builder.Build();

@@ -1,40 +1,113 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShowCardComponent } from '../show-card/show-card.component';
 import { ShowService } from '../../services/show.service';
 import { ShowDto } from '../../models/show.dto';
+import {
+  Subject,
+  takeUntil,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  map,
+} from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { BookmarkService } from '../../services/bookmark.service';
 
 @Component({
   selector: 'app-trending',
   standalone: true,
-  imports: [CommonModule, ShowCardComponent],
+  imports: [CommonModule, ShowCardComponent, FormsModule],
   templateUrl: './trending.component.html',
 })
-export class TrendingComponent implements OnInit {
+export class TrendingComponent implements OnInit, OnDestroy {
   trendingShows: ShowDto[] = [];
-  isLoading = true;
+  loading = false;
   error: string | null = null;
+  selectedFilter: 'all' | 'movies' | 'tv-shows' = 'all';
+  searchQuery: string = '';
+  private destroy$ = new Subject<void>();
+  private searchSubject$ = new Subject<string>();
 
-  constructor(private showService: ShowService) {}
+  constructor(
+    private showService: ShowService,
+    private bookmarkService: BookmarkService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.setupSearch();
     this.loadTrendingShows();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupSearch(): void {
+    this.searchSubject$
+      .pipe(
+        takeUntil(this.destroy$),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          if (!query.trim()) {
+            return this.showService.getTrendingShows();
+          }
+          this.loading = true;
+          return this.showService.searchShows(query);
+        })
+      )
+      .subscribe({
+        next: (shows) => {
+          this.trendingShows = shows;
+          this.loading = false;
+          this.error = null;
+        },
+        error: (err) => {
+          console.error('Error searching shows:', err);
+          this.error = 'Failed to search shows. Please try again later.';
+          this.loading = false;
+        },
+      });
+  }
+
+  onSearch(): void {
+    this.searchSubject$.next(this.searchQuery);
+  }
+
   private loadTrendingShows(): void {
-    this.isLoading = true;
+    this.loading = true;
     this.error = null;
-    this.showService.getTrendingShows().subscribe({
-      next: (shows) => {
-        this.trendingShows = shows;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading trending shows:', err);
-        this.error = 'Failed to load trending shows. Please try again later.';
-        this.isLoading = false;
-      },
-    });
+
+    this.showService
+      .getTrendingShows()
+      .pipe(
+        map((shows) => this.bookmarkService.updateShowsBookmarkStatus(shows)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (shows) => {
+          this.trendingShows = shows;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading trending shows:', error);
+          this.error = 'Failed to load trending shows. Please try again later.';
+          this.loading = false;
+        },
+      });
+  }
+
+  onFilterChange(filter: 'all' | 'movies' | 'tv-shows'): void {
+    if (this.selectedFilter !== filter) {
+      this.selectedFilter = filter;
+      this.loadTrendingShows();
+    }
   }
 
   onWatchlistToggle(show: ShowDto): void {
@@ -42,6 +115,38 @@ export class TrendingComponent implements OnInit {
       this.removeFromWatchlist(show);
     } else {
       this.addToWatchlist(show);
+    }
+  }
+
+  onBookmarkToggle(show: ShowDto): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.bookmarkService.isBookmarked(show.id)) {
+      this.bookmarkService.removeBookmark(show.id).subscribe({
+        next: () => {
+          const index = this.trendingShows.findIndex((s) => s.id === show.id);
+          if (index !== -1) {
+            this.trendingShows[index] = {
+              ...this.trendingShows[index],
+              isBookmarked: false,
+            };
+          }
+        },
+        error: (error) => console.error('Error removing bookmark:', error),
+      });
+    } else {
+      this.bookmarkService.addBookmark(show).subscribe({
+        next: (updatedShow) => {
+          const index = this.trendingShows.findIndex((s) => s.id === show.id);
+          if (index !== -1) {
+            this.trendingShows[index] = updatedShow;
+          }
+        },
+        error: (error) => console.error('Error adding bookmark:', error),
+      });
     }
   }
 

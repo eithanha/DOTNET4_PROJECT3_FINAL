@@ -1,48 +1,38 @@
 <div
   class="group relative flex flex-col bg-slate-800 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
 >
-  <!-- Image section -->
   <div class="relative w-full aspect-[2/3]">
     <img
       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-      [src]="getImageUrl(show.posterPath)"
+      [src]="getImageUrl()"
       [alt]="show.title"
     />
 
-    <!-- Bookmark button -->
-    <button
-      *ngIf="isLoggedIn()"
-      class="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-black/70"
-      (click)="toggleWatchlist()"
-    >
-      <svg
-        class="w-5 h-5"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
+    <div class="absolute top-2 right-2">
+      <button
+        *ngIf="authService.isLoggedIn()"
+        (click)="onBookmarkToggle()"
+        class="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        [class.text-blue-600]="show.isBookmarked"
       >
-        <path
-          *ngIf="!show.isWatchlisted"
-          d="M5 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v18l-7-3-7 3V3z"
-          stroke="#FFF"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          *ngIf="show.isWatchlisted"
-          d="M5 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v18l-7-3-7 3V3z"
-          fill="#FFF"
-          stroke="#FFF"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          [attr.fill]="show.isBookmarked ? 'currentColor' : 'none'"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"
+          />
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- Content section -->
   <div
     class="flex flex-col flex-grow p-4 bg-gradient-to-t from-slate-900 to-slate-800"
   >
@@ -51,7 +41,7 @@
         {{ show.title }}
       </h3>
       <p class="text-slate-400 text-sm">
-        {{ show.releaseDate | date : "mediumDate" }}
+        {{ show.ReleaseDate | date : "mediumDate" }}
       </p>
     </div>
 
@@ -65,7 +55,7 @@
         <div class="flex items-center text-slate-400 text-sm">
           <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path
-              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.363 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.363 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
             />
           </svg>
           {{ show.rating | number : "1.1-1" }}

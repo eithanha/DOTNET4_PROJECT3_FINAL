@@ -136,7 +136,7 @@
       <li class="mr-4" *ngIf="authService.isLoggedIn()">
         <a
           class="flex items-center justify-center px-4 py-2 text-slate-400 hover:text-red-500 transition-colors duration-300"
-          (click)="authService.logout().subscribe()"
+          (click)="onLogout()"
           style="cursor: pointer"
         >
           Logout

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,5 +11,18 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './navigation.component.html',
 })
 export class NavigationComponent {
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private router: Router) {}
+
+  onLogout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Error during logout:', error);
+
+        this.router.navigate(['/']);
+      },
+    });
+  }
 }
