@@ -1,9 +1,5 @@
 <div class="min-h-screen">
   <div class="container mx-auto px-4 py-8">
-    <div class="flex items-center justify-center">
-      <h1 class="text-3xl font-bold text-black mb-8">Trending Shows</h1>
-    </div>
-
     <div class="mb-6">
       <div class="relative">
         <input
@@ -56,6 +52,12 @@
       >
         TV Shows
       </button>
+    </div>
+
+    <div class="flex items-center justify-center">
+      <h1 class="text-3xl font-bold text-black mb-4">
+        {{ getFilterDisplayName() }}
+      </h1>
     </div>
 
     <div *ngIf="loading" class="flex justify-center items-center min-h-[400px]">

@@ -175,4 +175,16 @@ export class TvShowsComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  getFilterDisplayName(): string {
+    switch (this.selectedFilter) {
+      case 'on-air':
+        return 'TV Shows Airing Today';
+      case 'top-rated':
+        return 'Top Rated TV Shows';
+      case 'popular':
+      default:
+        return 'Popular TV Shows';
+    }
+  }
 }

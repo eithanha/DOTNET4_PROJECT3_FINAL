@@ -1,4 +1,8 @@
-
+using System;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using PlotPocket.Server.Models.Responses;
 using RestSharp;
 
@@ -33,8 +37,8 @@ public class TMDBService
 
         var response = await _client.ExecuteGetAsync(request);
         var result = JsonSerializer.Deserialize<TrendingResponse>(response.Content);
-
-
+        
+        // Update poster paths to use consistent size
         if (result?.Results != null)
         {
             foreach (var item in result.Results)
@@ -49,8 +53,8 @@ public class TMDBService
                 }
             }
         }
-
-        return result;
+        
+        return result ?? new TrendingResponse { Results = new List<Trending>() };
     }
 
     public async Task<TrendingResponse> GetTrendingMoviesAsync(string timeWindow = "day")
@@ -60,7 +64,7 @@ public class TMDBService
         request.AddHeader("accept", "application/json");
 
         var response = await _client.ExecuteGetAsync(request);
-        return JsonSerializer.Deserialize<TrendingResponse>(response.Content);
+        return JsonSerializer.Deserialize<TrendingResponse>(response.Content) ?? new TrendingResponse { Results = new List<Trending>() };
     }
 
     public async Task<TrendingResponse> GetTrendingTvShowsAsync(string timeWindow = "day")
@@ -70,7 +74,7 @@ public class TMDBService
         request.AddHeader("accept", "application/json");
 
         var response = await _client.ExecuteGetAsync(request);
-        return JsonSerializer.Deserialize<TrendingResponse>(response.Content);
+        return JsonSerializer.Deserialize<TrendingResponse>(response.Content) ?? new TrendingResponse { Results = new List<Trending>() };
     }
 
     public async Task<TrendingResponse> SearchShowsAsync(string query)
@@ -81,12 +85,12 @@ public class TMDBService
         request.AddHeader("accept", "application/json");
 
         var response = await _client.ExecuteGetAsync(request);
-        return JsonSerializer.Deserialize<TrendingResponse>(response.Content);
+        return JsonSerializer.Deserialize<TrendingResponse>(response.Content) ?? new TrendingResponse { Results = new List<Trending>() };
     }
 
     public async Task<ApiMediaItem> GetShowDetailsAsync(int showId)
     {
-
+        // Try to get movie details first
         var movieRequest = new RestRequest($"/movie/{showId}");
         movieRequest.AddParameter("api_key", _apiKey);
         movieRequest.AddHeader("accept", "application/json");
@@ -98,11 +102,11 @@ public class TMDBService
             if (movie != null)
             {
                 movie.PosterPath = GetFullImageUrl(movie.PosterPath);
+                return movie;
             }
-            return movie;
         }
 
-
+        // If movie not found, try TV show
         var tvRequest = new RestRequest($"/tv/{showId}");
         tvRequest.AddParameter("api_key", _apiKey);
         tvRequest.AddHeader("accept", "application/json");
@@ -112,20 +116,20 @@ public class TMDBService
         if (tvShow != null)
         {
             tvShow.PosterPath = GetFullImageUrl(tvShow.PosterPath);
+            return tvShow;
         }
-        return tvShow;
+
+        throw new InvalidOperationException($"Show with ID {showId} not found");
     }
 
-
+    // Movie Endpoints
     public async Task<MovieResponse> GetNowPlayingMoviesAsync(int page = 1)
     {
         var request = new RestRequest($"/movie/now_playing?api_key={_apiKey}&page={page}")
                       .AddHeader("accept", "application/json");
 
         var response = await _client.GetAsync(request);
-        MovieResponse? movieResponse = JsonSerializer.Deserialize<MovieResponse>(response.Content);
-
-        return movieResponse ?? new MovieResponse { Results = new List<Movie>() };
+        return JsonSerializer.Deserialize<MovieResponse>(response.Content) ?? new MovieResponse { Results = new List<Movie>() };
     }
 
     public async Task<MovieResponse> GetTopRatedMoviesAsync(int page = 1)
@@ -134,9 +138,7 @@ public class TMDBService
                       .AddHeader("accept", "application/json");
 
         var response = await _client.GetAsync(request);
-        MovieResponse? movieResponse = JsonSerializer.Deserialize<MovieResponse>(response.Content);
-
-        return movieResponse ?? new MovieResponse { Results = new List<Movie>() };
+        return JsonSerializer.Deserialize<MovieResponse>(response.Content) ?? new MovieResponse { Results = new List<Movie>() };
     }
 
     public async Task<MovieResponse> GetPopularMoviesAsync(int page = 1)
@@ -150,7 +152,7 @@ public class TMDBService
 
             var request = new RestRequest($"/movie/popular?api_key={_apiKey}&page={page}")
                           .AddHeader("accept", "application/json");
-
+            
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
@@ -178,16 +180,14 @@ public class TMDBService
         }
     }
 
-
+    // TV Show Endpoints
     public async Task<TvShowResponse> GetAiringTodayTvShowsAsync(int page = 1)
     {
         var request = new RestRequest($"/tv/airing_today?api_key={_apiKey}&page={page}")
                       .AddHeader("accept", "application/json");
 
         var response = await _client.GetAsync(request);
-        TvShowResponse? tvShowResponse = JsonSerializer.Deserialize<TvShowResponse>(response.Content);
-
-        return tvShowResponse ?? new TvShowResponse { Results = new List<TvShow>() };
+        return JsonSerializer.Deserialize<TvShowResponse>(response.Content) ?? new TvShowResponse { Results = new List<TvShow>() };
     }
 
     public async Task<TvShowResponse> GetTopRatedTvShowsAsync(int page = 1)
@@ -196,9 +196,7 @@ public class TMDBService
                       .AddHeader("accept", "application/json");
 
         var response = await _client.GetAsync(request);
-        TvShowResponse? tvShowResponse = JsonSerializer.Deserialize<TvShowResponse>(response.Content);
-
-        return tvShowResponse ?? new TvShowResponse { Results = new List<TvShow>() };
+        return JsonSerializer.Deserialize<TvShowResponse>(response.Content) ?? new TvShowResponse { Results = new List<TvShow>() };
     }
 
     public async Task<TvShowResponse> GetPopularTvShowsAsync(int page = 1)
@@ -212,7 +210,7 @@ public class TMDBService
 
             var request = new RestRequest($"/tv/popular?api_key={_apiKey}&page={page}")
                           .AddHeader("accept", "application/json");
-
+            
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
@@ -246,11 +244,6 @@ public class TMDBService
                       .AddHeader("accept", "application/json");
 
         var response = await _client.GetAsync(request);
-        TvShowResponse? tvShowResponse = JsonSerializer.Deserialize<TvShowResponse>(response.Content);
-
-        return tvShowResponse ?? new TvShowResponse { Results = new List<TvShow>() };
+        return JsonSerializer.Deserialize<TvShowResponse>(response.Content) ?? new TvShowResponse { Results = new List<TvShow>() };
     }
-
-
-
 }

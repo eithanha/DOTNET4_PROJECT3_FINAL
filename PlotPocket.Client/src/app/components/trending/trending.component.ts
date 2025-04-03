@@ -173,4 +173,17 @@ export class TrendingComponent implements OnInit, OnDestroy {
       },
     });
   }
+
+  getFilterDisplayName(): string {
+    switch (this.selectedFilter) {
+      case 'all':
+        return 'Trending Shows';
+      case 'movies':
+        return 'Trending Movies';
+      case 'tv-shows':
+        return 'Trending TV Shows';
+      default:
+        return 'Trending';
+    }
+  }
 }

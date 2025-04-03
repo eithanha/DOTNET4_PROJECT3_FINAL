@@ -175,4 +175,17 @@ export class MoviesComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  getFilterDisplayName(): string {
+    switch (this.selectedFilter) {
+      case 'now-playing':
+        return 'Now Playing Movies';
+      case 'top-rated':
+        return 'Top Rated Movies';
+      case 'popular':
+        return 'Popular Movies';
+      default:
+        return 'Movies';
+    }
+  }
 }
