@@ -1,30 +1,91 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, shareReplay } from 'rxjs';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
+import {
+  BehaviorSubject,
+  Observable,
+  tap,
+  shareReplay,
+  throwError,
+  catchError,
+  map,
+} from 'rxjs';
 import { ShowDto } from '../models/show.dto';
-import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookmarkService {
-  private apiUrl = `${environment.apiUrl}/shows`;
+  private readonly apiUrl = '/api/shows';
   private bookmarksSubject = new BehaviorSubject<ShowDto[]>([]);
   private bookmarksCache = new Set<number>();
   private isLoading = false;
   private bookmarks$: Observable<ShowDto[]>;
 
-  constructor(private http: HttpClient, private authService: AuthService) {
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.bookmarks$ = this.bookmarksSubject.asObservable().pipe(shareReplay(1));
-
     this.loadBookmarks();
   }
 
-  private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-    });
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json');
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    if (error.status === 401 || error.status === 403) {
+      this.authService.clearFrontendCredentials();
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+    }
+    return throwError(() => error);
+  }
+
+  private get<T>(url: string): Observable<T> {
+    return this.http
+      .get<T>(url, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
+  }
+
+  private post<T>(url: string, body: any): Observable<T> {
+    return this.http
+      .post<T>(url, body, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
+  }
+
+  private delete<T>(url: string): Observable<T> {
+    return this.http
+      .delete<T>(url, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
   }
 
   get bookmarksObservable(): Observable<ShowDto[]> {
@@ -35,72 +96,56 @@ export class BookmarkService {
     return this.bookmarksSubject.value;
   }
 
-  loadBookmarks(): void {
+  getBookmarks(): Observable<ShowDto[]> {
+    return this.bookmarks$;
+  }
+
+  private loadBookmarks(): void {
     if (this.isLoading) return;
-
     this.isLoading = true;
-    this.http
-      .get<ShowDto[]>(`${this.apiUrl}/bookmarks`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
+
+    this.get<ShowDto[]>(`${this.apiUrl}/bookmarks`)
       .pipe(
-        tap({
-          finalize: () => (this.isLoading = false),
-        })
-      )
-      .subscribe({
-        next: (bookmarks) => {
+        tap((bookmarks) => {
           this.bookmarksSubject.next(bookmarks);
-
           this.bookmarksCache = new Set(bookmarks.map((b) => b.id));
-        },
-        error: (error) => {
-          console.error('Error loading bookmarks:', error);
-          this.bookmarksSubject.next([]);
-          this.bookmarksCache.clear();
-        },
-      });
-  }
-
-  addBookmark(show: ShowDto): Observable<ShowDto> {
-    return this.http
-      .post<ShowDto>(
-        `${this.apiUrl}/${show.id}/bookmark`,
-        {},
-        {
-          withCredentials: true,
-          headers: this.getAuthHeaders(),
-        }
+          this.isLoading = false;
+        })
       )
-      .pipe(
-        tap((newBookmark) => {
-          const currentBookmarks = this.bookmarksSubject.value;
-          this.bookmarksSubject.next([...currentBookmarks, newBookmark]);
-          this.bookmarksCache.add(newBookmark.id);
-        })
-      );
+      .subscribe();
   }
 
-  removeBookmark(showId: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${showId}/bookmark`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
+  addBookmark(showOrId: ShowDto | number): Observable<ShowDto> {
+    const showId = typeof showOrId === 'number' ? showOrId : showOrId.id;
+    return this.post<ShowDto>(`${this.apiUrl}/${showId}/bookmark`, {}).pipe(
+      tap((show) => {
+        const currentBookmarks = this.bookmarksSubject.value;
+        this.bookmarksSubject.next([...currentBookmarks, show]);
+        this.bookmarksCache.add(show.id);
       })
-      .pipe(
-        tap(() => {
-          const currentBookmarks = this.bookmarksSubject.value;
-          this.bookmarksSubject.next(
-            currentBookmarks.filter((bookmark) => bookmark.id !== showId)
-          );
-          this.bookmarksCache.delete(showId);
-        })
-      );
+    );
+  }
+
+  removeBookmark(showId: number): Observable<ShowDto> {
+    return this.delete<ShowDto>(`${this.apiUrl}/${showId}/bookmark`).pipe(
+      tap(() => {
+        const currentBookmarks = this.bookmarksSubject.value;
+        this.bookmarksSubject.next(
+          currentBookmarks.filter((b) => b.id !== showId)
+        );
+        this.bookmarksCache.delete(showId);
+      })
+    );
   }
 
   isBookmarked(showId: number): boolean {
     return this.bookmarksCache.has(showId);
+  }
+
+  toggleBookmark(showId: number): Observable<ShowDto> {
+    return this.isBookmarked(showId)
+      ? this.removeBookmark(showId)
+      : this.addBookmark(showId);
   }
 
   updateShowsBookmarkStatus(shows: ShowDto[]): ShowDto[] {

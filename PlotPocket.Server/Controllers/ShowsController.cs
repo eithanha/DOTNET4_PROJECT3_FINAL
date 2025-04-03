@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using PlotPocket.Server.Services;
 using PlotPocket.Server.Models.Dtos;
-using System;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 

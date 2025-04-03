@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using PlotPocket.Server.Models;
 using PlotPocket.Server.Services;
 using System.Security.Claims;
 using PlotPocket.Server.Models.Dtos;
-using PlotPocket.Server.Models.Responses;
+
 
 namespace PlotPocket.Server.Controllers;
 
@@ -12,10 +11,10 @@ namespace PlotPocket.Server.Controllers;
 [ApiController]
 public class MoviesController : ControllerBase
 {
-    private readonly ITmdbService _tmdbService;
+    private readonly TMDBService _tmdbService;
     private readonly ShowService _showService;
 
-    public MoviesController(ITmdbService tmdbService, ShowService showService)
+    public MoviesController(TMDBService tmdbService, ShowService showService)
     {
         _tmdbService = tmdbService;
         _showService = showService;

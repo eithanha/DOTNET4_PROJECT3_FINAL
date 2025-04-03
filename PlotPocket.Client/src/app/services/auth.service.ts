@@ -1,84 +1,125 @@
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  tap,
+  catchError,
+  throwError,
+  map,
+} from 'rxjs';
 import { User } from '../models/user';
 import { EmailLoginDetails } from '../models/email-login-details';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private _http = inject(HttpClient);
-  private _apiUrl = 'http://localhost:5000';
+  private readonly apiUrl = '/api/auth';
+  private userSubject = new BehaviorSubject<User | null>(null);
+  private user$ = this.userSubject.asObservable();
 
-  private _userKey: string = 'curUser';
-  private _userSubject: BehaviorSubject<User | null> =
-    new BehaviorSubject<User | null>(null);
-
-  public user$: Observable<User | null> = this._userSubject.asObservable();
-
-  constructor() {
+  constructor(private http: HttpClient, private router: Router) {
     this.checkAuthStatus();
   }
 
-  public get user(): User | null {
-    return this._userSubject.value;
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json');
   }
 
-  public register(details: EmailLoginDetails): Observable<User> {
-    return this._http
-      .post<User>(`${this._apiUrl}/api/auth/register`, details)
-      .pipe(
-        tap((user) => {
-          this._userSubject.next(user);
-        })
-      );
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    if (error.status === 401 || error.status === 403) {
+      this.clearFrontendCredentials();
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+    }
+    return throwError(() => error);
   }
 
-  public login(details: EmailLoginDetails): Observable<User> {
-    return this._http
-      .post<User>(`${this._apiUrl}/api/auth/login`, details, {
+  private get<T>(url: string): Observable<T> {
+    return this.http
+      .get<T>(url, {
         withCredentials: true,
+        headers: this.getHeaders(),
       })
       .pipe(
-        tap((user) => {
-          this._userSubject.next(user);
-        })
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
       );
   }
 
-  public isLoggedIn(): boolean {
-    return !!this._userSubject.value;
-  }
-
-  public logout(): Observable<any> {
-    return this._http
-      .post<any>(
-        `${this._apiUrl}/api/auth/logout`,
-        {},
-        { withCredentials: true }
-      )
+  private post<T>(url: string, body: any): Observable<T> {
+    return this.http
+      .post<T>(url, body, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
       .pipe(
-        tap(() => {
-          this._userSubject.next(null);
-        })
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
       );
   }
 
-  public clearFrontendCredentials(): void {
-    this._userSubject.next(null);
+  getCurrentUser(): Observable<User | null> {
+    return this.user$;
   }
 
-  public checkAuthStatus(): void {
-    this._http
-      .get<User>(`${this._apiUrl}/api/auth/status`, { withCredentials: true })
+  isLoggedIn(): boolean {
+    return this.userSubject.value !== null;
+  }
+
+  login(details: EmailLoginDetails): Observable<User> {
+    return this.post<User>(`${this.apiUrl}/login`, details).pipe(
+      tap((user) => {
+        this.userSubject.next(user);
+      })
+    );
+  }
+
+  register(details: EmailLoginDetails): Observable<User> {
+    return this.post<User>(`${this.apiUrl}/register`, details).pipe(
+      tap((user) => {
+        this.userSubject.next(user);
+      })
+    );
+  }
+
+  logout(): Observable<void> {
+    return this.post<void>(`${this.apiUrl}/logout`, {}).pipe(
+      tap(() => {
+        this.clearFrontendCredentials();
+      })
+    );
+  }
+
+  clearFrontendCredentials(): void {
+    this.userSubject.next(null);
+  }
+
+  private checkAuthStatus(): void {
+    this.get<User>(`${this.apiUrl}/status`)
       .pipe(
         tap((user) => {
-          this._userSubject.next(user);
+          this.userSubject.next(user);
         }),
-        catchError(() => {
-          this._userSubject.next(null);
-          return of(null);
+        catchError((error) => {
+          if (error.status === 401) {
+            this.clearFrontendCredentials();
+            return new Observable<User | null>((subscriber) => {
+              subscriber.next(null);
+              subscriber.complete();
+            });
+          }
+
+          return throwError(() => error);
         })
       )
       .subscribe();

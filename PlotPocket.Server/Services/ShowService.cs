@@ -1,16 +1,11 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using PlotPocket.Server.Models;
-
 using PlotPocket.Server.Models.Responses;
 using PlotPocket.Server.Data;
 using PlotPocket.Server.Models.Dtos;
 
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-using System.Collections.Generic;
+
 
 namespace PlotPocket.Server.Services;
 
@@ -22,9 +17,9 @@ public class ShowService
     private readonly HttpClient _httpClient;
     private readonly string _tmdbApiKey;
     private readonly string _tmdbBaseUrl = "https://api.themoviedb.org/3";
-    private readonly ITmdbService _tmdbService;
+    private readonly TMDBService _tmdbService;
 
-    public ShowService(ApplicationDbContext context, IConfiguration configuration, ITmdbService tmdbService)
+    public ShowService(ApplicationDbContext context, IConfiguration configuration, TMDBService tmdbService)
     {
         _context = context;
         _configuration = configuration;
@@ -32,7 +27,7 @@ public class ShowService
         _tmdbApiKey = configuration["TMDB:ApiKey"];
         _tmdbService = tmdbService;
 
-        
+
         var handler = new HttpClientHandler
         {
             ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true,
@@ -50,14 +45,7 @@ public class ShowService
         };
     }
 
-    /**
-     * Below can be used for converting return objects from the Trending endpoints 
-     * to ShowDtos. 
-     * 
-     * TODO: Make sure to fill in the ShowDto properties on the return of this method.
-     *          You should **NOT** need to modify anything else.
-     * 
-     **/
+
     private ShowDto MediaItemToShowDto(ApiMediaItem mediaItem, string userId = null)
     {
         string title = null;
@@ -179,7 +167,7 @@ public class ShowService
             var url = $"{_tmdbBaseUrl}/trending/all/day?api_key={_tmdbApiKey}";
             Console.WriteLine($"Making request to TMDB: {url}");
 
-            
+
             int maxRetries = 3;
             int currentRetry = 0;
             while (currentRetry < maxRetries)
@@ -204,7 +192,7 @@ public class ShowService
                 {
                     currentRetry++;
                     Console.WriteLine($"Attempt {currentRetry} failed: {ex.Message}");
-                    await Task.Delay(1000 * currentRetry); 
+                    await Task.Delay(1000 * currentRetry);
                     continue;
                 }
                 catch (HttpRequestException ex)
@@ -328,7 +316,7 @@ public class ShowService
 
         if (show == null)
         {
-            // If show doesn't exist in our database, create it
+
             var movieDetails = await GetShowDetails(showId);
             show = new Show
             {
@@ -383,23 +371,23 @@ public class ShowService
     {
         try
         {
-            // Search movies
+
             var movieResponse = await _httpClient.GetAsync($"{_tmdbBaseUrl}/search/movie?api_key={_tmdbApiKey}&query={Uri.EscapeDataString(query)}");
             movieResponse.EnsureSuccessStatusCode();
             var movieContent = await movieResponse.Content.ReadAsStringAsync();
             var movieSearchResponse = JsonSerializer.Deserialize<TrendingResponse>(movieContent);
 
-            // Search TV shows
+
             var tvResponse = await _httpClient.GetAsync($"{_tmdbBaseUrl}/search/tv?api_key={_tmdbApiKey}&query={Uri.EscapeDataString(query)}");
             tvResponse.EnsureSuccessStatusCode();
             var tvContent = await tvResponse.Content.ReadAsStringAsync();
             var tvSearchResponse = JsonSerializer.Deserialize<TrendingResponse>(tvContent);
 
-            // Combine and convert results
+
             var movieResults = movieSearchResponse?.Results.Select(item => MediaItemToShowDto(item, null)) ?? new List<ShowDto>();
             var tvResults = tvSearchResponse?.Results.Select(item => MediaItemToShowDto(item, null)) ?? new List<ShowDto>();
 
-            // Combine results and sort by rating
+
             return movieResults.Concat(tvResults)
                 .OrderByDescending(show => show.Rating)
                 .ToList();
@@ -424,7 +412,7 @@ public class ShowService
             var url = $"{_tmdbBaseUrl}/tv/popular?api_key={_tmdbApiKey}";
             Console.WriteLine($"Making request to TMDB: {url}");
 
-            // Add retry logic
+
             int maxRetries = 3;
             int currentRetry = 0;
             while (currentRetry < maxRetries)
@@ -554,14 +542,14 @@ public class ShowService
         {
             Console.WriteLine($"Adding bookmark for show {showId} and user {userId}");
 
-            // Check if bookmark already exists
+
             var existingBookmark = await _context.Bookmarks
                 .FirstOrDefaultAsync(b => b.ShowId == showId && b.UserId == userId);
 
             if (existingBookmark != null)
             {
                 Console.WriteLine($"Bookmark already exists for show {showId}");
-                // If bookmark exists, just return the show details
+
                 try
                 {
                     var existingShow = await _tmdbService.GetShowDetailsAsync(showId);
@@ -575,7 +563,7 @@ public class ShowService
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error getting show details for existing bookmark: {ex.Message}");
-                    // If we can't get show details, return a basic DTO
+
                     return new ShowDto
                     {
                         Id = showId,
@@ -584,7 +572,7 @@ public class ShowService
                 }
             }
 
-            // Create new bookmark
+
             var bookmark = new Bookmark
             {
                 ShowId = showId,
@@ -596,7 +584,7 @@ public class ShowService
             await _context.SaveChangesAsync();
             Console.WriteLine($"Created new bookmark for show {showId}");
 
-            // Get show details from TMDB
+
             try
             {
                 var newShow = await _tmdbService.GetShowDetailsAsync(showId);
@@ -610,7 +598,7 @@ public class ShowService
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting show details for new bookmark: {ex.Message}");
-                // If we can't get show details, return a basic DTO
+
                 return new ShowDto
                 {
                     Id = showId,
@@ -618,7 +606,7 @@ public class ShowService
                 };
             }
 
-            // If we get here, something went wrong with getting show details
+
             throw new Exception($"Failed to get show details for show {showId}");
         }
         catch (Exception ex)
@@ -650,7 +638,7 @@ public class ShowService
     {
         try
         {
-            // Get all bookmarked show IDs for the user
+
             var bookmarkedShowIds = await _context.Bookmarks
                 .Where(b => b.UserId == userId)
                 .Select(b => b.ShowId)
@@ -675,7 +663,7 @@ public class ShowService
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error getting show details for showId {showId}: {ex.Message}");
-                    // Continue with other shows even if one fails
+
                     continue;
                 }
             }
@@ -692,16 +680,16 @@ public class ShowService
 
     private ShowDto MapToShowDto(dynamic show)
     {
-        // Fix the poster path handling
+
         string? posterPath = null;
         if (!string.IsNullOrEmpty(show.PosterPath))
         {
-            // If the poster path already starts with http, use it as is
+
             if (show.PosterPath.ToString().StartsWith("http"))
             {
                 posterPath = show.PosterPath.ToString();
             }
-            // Otherwise, construct the full URL
+
             else
             {
                 posterPath = _tmdbImageBaseUrl + show.PosterPath.ToString();

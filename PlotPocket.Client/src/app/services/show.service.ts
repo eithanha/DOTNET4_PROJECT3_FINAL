@@ -1,28 +1,93 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, shareReplay, timeout, catchError, map } from 'rxjs';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
+import {
+  Observable,
+  tap,
+  shareReplay,
+  timeout,
+  catchError,
+  map,
+  throwError,
+} from 'rxjs';
 import { ShowDto } from '../models/show.dto';
-import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShowService {
-  private apiUrl = `${environment.apiUrl}/shows`;
-  private moviesUrl = `${environment.apiUrl}/movies`;
-  private tvShowsUrl = `${environment.apiUrl}/TvShows`;
+  private readonly apiUrl = '/api';
+  private readonly moviesUrl: string;
+  private readonly tvShowsUrl: string;
   private cache = new Map<string, Observable<ShowDto[]>>();
   private readonly CACHE_SIZE = 1;
   private readonly TIMEOUT = 10000;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.moviesUrl = `${this.apiUrl}/movies`;
+    this.tvShowsUrl = `${this.apiUrl}/TvShows`;
+  }
 
-  private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    });
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json');
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    if (error.status === 401 || error.status === 403) {
+      this.authService.clearFrontendCredentials();
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+    }
+    return throwError(() => error);
+  }
+
+  private get<T>(url: string, options: any = {}): Observable<T> {
+    return this.http
+      .get<T>(url, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+        ...options,
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
+  }
+
+  private post<T>(url: string, body: any): Observable<T> {
+    return this.http
+      .post<T>(url, body, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
+  }
+
+  private delete<T>(url: string): Observable<T> {
+    return this.http
+      .delete<T>(url, {
+        withCredentials: true,
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response as T),
+        catchError(this.handleError.bind(this))
+      );
   }
 
   private transformShow(show: any): ShowDto {
@@ -38,196 +103,94 @@ export class ShowService {
   }
 
   getTrendingShows(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.apiUrl}/trending/all`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/trending/all`).pipe(
+      timeout(this.TIMEOUT),
+      tap((shows) => this.updateCache('trending', shows))
+    );
   }
 
   getTrendingMovies(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.apiUrl}/trending/movies`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/trending/movies`).pipe(
+      timeout(this.TIMEOUT),
+      tap((shows) => this.updateCache('movies', shows))
+    );
   }
 
   getTrendingTvShows(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.apiUrl}/trending/tv-shows`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/trending/tv-shows`).pipe(
+      timeout(this.TIMEOUT),
+      tap((shows) => this.updateCache('tv-shows', shows))
+    );
   }
 
   searchShows(query: string): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.apiUrl}/search`, {
-        params: { query },
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
-  }
-
-  private getCachedRequest(url: string): Observable<ShowDto[]> {
-    if (!this.cache.has(url)) {
-      const request = this.http
-        .get<ShowDto[]>(url, {
-          withCredentials: true,
-          headers: this.getAuthHeaders(),
-        })
-        .pipe(
-          timeout(this.TIMEOUT),
-          map((shows) => this.transformShows(shows)),
-          shareReplay({ bufferSize: this.CACHE_SIZE, refCount: true }),
-          catchError((error) => {
-            console.error(`Error fetching from ${url}:`, error);
-            throw error;
-          })
-        );
-      this.cache.set(url, request);
-    }
-    return this.cache.get(url)!;
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/search`, {
+      params: { query },
+    }).pipe(timeout(this.TIMEOUT));
   }
 
   getMovies(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.moviesUrl}`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.moviesUrl}`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getNowPlayingMovies(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.moviesUrl}/now-playing`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.moviesUrl}/now-playing`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getTopRatedMovies(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.moviesUrl}/top-rated`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.moviesUrl}/top-rated`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getPopularMovies(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.moviesUrl}/popular`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.moviesUrl}/popular`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getPopularTvShows(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.tvShowsUrl}/popular`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.tvShowsUrl}/popular`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getTopRatedTvShows(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.tvShowsUrl}/top-rated`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.tvShowsUrl}/top-rated`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getOnAirTvShows(): Observable<ShowDto[]> {
-    return this.http
-      .get<ShowDto[]>(`${this.tvShowsUrl}/on-air`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((shows) => this.transformShows(shows)));
+    return this.get<ShowDto[]>(`${this.tvShowsUrl}/on-air`).pipe(
+      map((shows) => this.transformShows(shows))
+    );
   }
 
   getBookmarks(): Observable<ShowDto[]> {
-    console.log('ShowService - Getting bookmarks');
-    return this.http
-      .get<ShowDto[]>(`${this.apiUrl}/bookmarks`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(
-        map((shows) => this.transformShows(shows)),
-        catchError((error) => {
-          console.error('Error getting bookmarks:', error);
-          throw error;
-        })
-      );
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/bookmarks`).pipe(
+      timeout(this.TIMEOUT)
+    );
   }
 
-  addBookmark(showId: number): Observable<ShowDto> {
-    if (!this.authService.isLoggedIn()) {
-      throw new Error('User is not logged in');
-    }
-    return this.http
-      .post<ShowDto>(
-        `${this.apiUrl}/${showId}/bookmark`,
-        {},
-        {
-          withCredentials: true,
-          headers: this.getAuthHeaders(),
-        }
-      )
-      .pipe(map((show) => this.transformShow(show)));
+  addToBookmarks(showId: number): Observable<ShowDto> {
+    return this.post<ShowDto>(`${this.apiUrl}/shows/${showId}/bookmark`, {});
   }
 
-  removeBookmark(showId: number): Observable<ShowDto> {
-    if (!this.authService.isLoggedIn()) {
-      throw new Error('User is not logged in');
-    }
-    return this.http
-      .delete<ShowDto>(`${this.apiUrl}/${showId}/bookmark`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((show) => this.transformShow(show)));
+  removeFromBookmarks(showId: number): Observable<ShowDto> {
+    return this.delete<ShowDto>(`${this.apiUrl}/shows/${showId}/bookmark`);
   }
 
   addToWatchlist(show: ShowDto): Observable<ShowDto> {
-    if (!this.authService.isLoggedIn()) {
-      throw new Error('User is not logged in');
-    }
-    return this.http
-      .post<ShowDto>(
-        `${this.apiUrl}/${show.id}/watchlist`,
-        {},
-        {
-          withCredentials: true,
-          headers: this.getAuthHeaders(),
-        }
-      )
-      .pipe(map((show) => this.transformShow(show)));
+    return this.post<ShowDto>(`${this.apiUrl}/shows/${show.id}/watchlist`, {});
   }
 
   removeFromWatchlist(show: ShowDto): Observable<ShowDto> {
-    if (!this.authService.isLoggedIn()) {
-      throw new Error('User is not logged in');
-    }
-    return this.http
-      .delete<ShowDto>(`${this.apiUrl}/${show.id}/watchlist`, {
-        withCredentials: true,
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(map((show) => this.transformShow(show)));
+    return this.delete<ShowDto>(`${this.apiUrl}/shows/${show.id}/watchlist`);
   }
 
   toggleWatchlist(show: ShowDto): Observable<ShowDto> {
@@ -237,5 +200,21 @@ export class ShowService {
     return show.isWatchlisted
       ? this.removeFromWatchlist(show)
       : this.addToWatchlist(show);
+  }
+
+  private updateCache(key: string, shows: ShowDto[]): void {
+    if (this.cache.size >= this.CACHE_SIZE) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(
+      key,
+      new Observable<ShowDto[]>((subscriber) => {
+        subscriber.next(shows);
+        subscriber.complete();
+      }).pipe(shareReplay(1))
+    );
   }
 }

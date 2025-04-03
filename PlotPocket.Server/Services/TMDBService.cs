@@ -1,14 +1,10 @@
-using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+
 using PlotPocket.Server.Models.Responses;
 using RestSharp;
 
 namespace PlotPocket.Server.Services;
 
-public class TMDBService : ITmdbService
+public class TMDBService
 {
     private readonly string _apiKey;
     private readonly string _baseUrl;
@@ -22,7 +18,7 @@ public class TMDBService : ITmdbService
         _client = new RestClient(_baseUrl);
     }
 
-    private string GetFullImageUrl(string posterPath)
+    private string? GetFullImageUrl(string? posterPath)
     {
         if (string.IsNullOrEmpty(posterPath)) return null;
         if (posterPath.StartsWith("http")) return posterPath;
@@ -37,8 +33,8 @@ public class TMDBService : ITmdbService
 
         var response = await _client.ExecuteGetAsync(request);
         var result = JsonSerializer.Deserialize<TrendingResponse>(response.Content);
-        
-        // Update poster paths to use consistent size
+
+
         if (result?.Results != null)
         {
             foreach (var item in result.Results)
@@ -53,7 +49,7 @@ public class TMDBService : ITmdbService
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -90,7 +86,7 @@ public class TMDBService : ITmdbService
 
     public async Task<ApiMediaItem> GetShowDetailsAsync(int showId)
     {
-        // Try to get movie details first
+
         var movieRequest = new RestRequest($"/movie/{showId}");
         movieRequest.AddParameter("api_key", _apiKey);
         movieRequest.AddHeader("accept", "application/json");
@@ -106,7 +102,7 @@ public class TMDBService : ITmdbService
             return movie;
         }
 
-        // If movie not found, try TV show
+
         var tvRequest = new RestRequest($"/tv/{showId}");
         tvRequest.AddParameter("api_key", _apiKey);
         tvRequest.AddHeader("accept", "application/json");
@@ -120,7 +116,7 @@ public class TMDBService : ITmdbService
         return tvShow;
     }
 
-    // Movie Endpoints
+
     public async Task<MovieResponse> GetNowPlayingMoviesAsync(int page = 1)
     {
         var request = new RestRequest($"/movie/now_playing?api_key={_apiKey}&page={page}")
@@ -154,7 +150,7 @@ public class TMDBService : ITmdbService
 
             var request = new RestRequest($"/movie/popular?api_key={_apiKey}&page={page}")
                           .AddHeader("accept", "application/json");
-            
+
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
@@ -182,7 +178,7 @@ public class TMDBService : ITmdbService
         }
     }
 
-    // TV Show Endpoints
+
     public async Task<TvShowResponse> GetAiringTodayTvShowsAsync(int page = 1)
     {
         var request = new RestRequest($"/tv/airing_today?api_key={_apiKey}&page={page}")
@@ -216,7 +212,7 @@ public class TMDBService : ITmdbService
 
             var request = new RestRequest($"/tv/popular?api_key={_apiKey}&page={page}")
                           .AddHeader("accept", "application/json");
-            
+
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
@@ -255,29 +251,6 @@ public class TMDBService : ITmdbService
         return tvShowResponse ?? new TvShowResponse { Results = new List<TvShow>() };
     }
 
-    /**
-	 * TODO:
-	 * Implement methods to hit the following endpoints. Write any helper methods that you see fit
-	 * following good design practices.
-	 * 
-	 * Trending
-	 * ----------
-	 * - All Trending (DONE above)
-	 * - Trending Movies
-	 * - Trending TvShows
-	 * 
-	 * Movies
-	 * ----------
-	 * - Now Playing Movies
-	 * - Top Rated Movies
-	 * - Popular Movies
-	 * 
-	 * TvShows
-	 * ----------
-	 * - Airing Today TvShows
-	 * - Top Rated TvShows
-	 * - Popular TvShows
-	 * 
-	 * */
+
 
 }

@@ -73,7 +73,7 @@ builder.Services.AddCors(options =>
 // Add distributed memory cache for session support
 builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddSingleton<ITmdbService, TMDBService>();
+builder.Services.AddSingleton<TMDBService>();
 builder.Services.AddScoped<ShowService>();
 
 var app = builder.Build();

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PlotPocket.Server.Models.Dtos;
 using PlotPocket.Server.Services;
-using System.Threading.Tasks;
-using System.Net.Http;
+
 
 namespace PlotPocket.Server.Controllers
 {

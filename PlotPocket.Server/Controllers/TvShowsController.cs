@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using PlotPocket.Server.Services;
 using PlotPocket.Server.Models.Dtos;
-using System;
-using PlotPocket.Server.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
@@ -14,10 +10,10 @@ namespace PlotPocket.Server.Controllers
     [Route("api/[controller]")]
     public class TvShowsController : ControllerBase
     {
-        private readonly ITmdbService _tmdbService;
+        private readonly TMDBService _tmdbService;
         private readonly ShowService _showService;
 
-        public TvShowsController(ITmdbService tmdbService, ShowService showService)
+        public TvShowsController(TMDBService tmdbService, ShowService showService)
         {
             _tmdbService = tmdbService;
             _showService = showService;
@@ -139,7 +135,7 @@ namespace PlotPocket.Server.Controllers
             try
             {
                 var shows = await _showService.SearchShows(query);
-                // Filter to only include TV shows
+
                 var tvShows = shows.Where(s => s.Type == ShowType.TvShow).ToList();
                 return Ok(tvShows);
             }

@@ -27,7 +27,7 @@ namespace PlotPocket.Server.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register([FromBody] EmailLoginDetails details)
         {
-            
+
             var user = new User
             {
                 UserName = details.Email,
@@ -36,7 +36,7 @@ namespace PlotPocket.Server.Controllers
                 UpdatedAt = DateTime.UtcNow
             };
 
-            
+
             var result = await _userManager.CreateAsync(user, details.Password);
 
             if (!result.Succeeded)
@@ -44,10 +44,10 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest(result.Errors.First().Description);
             }
 
-            
+
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-           
+
             user.PasswordHash = null;
             return Ok(user);
         }
@@ -58,7 +58,7 @@ namespace PlotPocket.Server.Controllers
         {
             try
             {
-                
+
                 var userCount = await _userManager.Users.CountAsync();
                 return Ok(new { message = "Connection test successful", userCount });
             }
@@ -72,7 +72,7 @@ namespace PlotPocket.Server.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] EmailLoginDetails details)
         {
-            
+
             var user = await _userManager.FindByEmailAsync(details.Email);
 
             if (user == null)
@@ -80,7 +80,7 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest("Invalid email or password");
             }
 
-            
+
             var result = await _signInManager.PasswordSignInAsync(user, details.Password, false, false);
 
             if (!result.Succeeded)
@@ -88,7 +88,7 @@ namespace PlotPocket.Server.Controllers
                 return BadRequest("Invalid email or password");
             }
 
-           
+
             user.PasswordHash = null;
             return Ok(user);
         }
@@ -114,7 +114,7 @@ namespace PlotPocket.Server.Controllers
                 return Unauthorized();
             }
 
-            
+
             user.PasswordHash = null;
             return Ok(user);
         }
