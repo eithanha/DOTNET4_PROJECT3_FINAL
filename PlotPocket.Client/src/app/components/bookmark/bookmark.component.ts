@@ -31,15 +31,15 @@ export class BookmarkComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('BookmarkComponent initialized');
+    console.log('BookmarkComponent Initialized');
     if (!this.authService.isLoggedIn()) {
-      console.log('User not logged in, redirecting to login page');
+      console.log('User Not Logged In, Redirecting To Login Page');
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: '/bookmark' },
       });
       return;
     }
-    console.log('User is logged in, loading bookmarks');
+    console.log('User Is Logged In, Loading Bookmarks');
     this.loadBookmarks();
     this.setupSearch();
   }
@@ -86,9 +86,9 @@ export class BookmarkComponent implements OnInit, OnDestroy {
             queryParams: { returnUrl: '/bookmark' },
           });
         } else {
-          this.error = 'Failed to load bookmarks. Please try again later.';
+          this.error = 'Failed To Load Bookmarks. Please Try Again Later.';
           this.loading = false;
-          console.error('Error loading bookmarks:', error);
+          console.error('Error Loading Bookmarks:', error);
         }
       },
     });
@@ -114,7 +114,7 @@ export class BookmarkComponent implements OnInit, OnDestroy {
               queryParams: { returnUrl: '/bookmark' },
             });
           } else {
-            console.error('Error removing bookmark:', error);
+            console.error('Error Removing Bookmark:', error);
           }
         },
       });

@@ -52,7 +52,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error fetching movies from TMDB");
+            return StatusCode(500, "Error Fetching Movies From TMDB");
         }
     }
 
@@ -87,7 +87,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error fetching now playing movies from TMDB");
+            return StatusCode(500, "Error Fetching Now Playing Movies From TMDB");
         }
     }
 
@@ -122,7 +122,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error fetching top rated movies from TMDB");
+            return StatusCode(500, "Error Fetching Top Rated Movies From TMDB");
         }
     }
 
@@ -157,7 +157,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error fetching popular movies from TMDB");
+            return StatusCode(500, "Error Fetching Popular Movies From TMDB");
         }
     }
 
@@ -178,7 +178,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error adding movie to watchlist");
+            return StatusCode(500, "Error Adding Movie To Watchlist");
         }
     }
 
@@ -199,7 +199,7 @@ public class MoviesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error removing movie from watchlist");
+            return StatusCode(500, "Error Removing Movie From Watchlist");
         }
     }
 }

@@ -68,8 +68,8 @@ export class MoviesComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading movies:', error);
-          this.error = 'Failed to load movies. Please try again later.';
+          console.error('Error Loading Movies:', error);
+          this.error = 'Failed To Load Movies. Please Try Again Later.';
           this.loading = false;
         },
       });
@@ -96,8 +96,8 @@ export class MoviesComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error searching movies:', error);
-          this.error = 'Failed to search movies. Please try again later.';
+          console.error('Error Searching Movies:', error);
+          this.error = 'Failed To Search Movies. Please Try Again Later.';
           this.loading = false;
         },
       });
@@ -125,7 +125,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
             };
           }
         },
-        error: (error) => console.error('Error removing bookmark:', error),
+        error: (error) => console.error('Error Removing Bookmark:', error),
       });
     } else {
       this.bookmarkService.addBookmark(show).subscribe({
@@ -135,7 +135,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
             this.movies[index] = updatedShow;
           }
         },
-        error: (error) => console.error('Error adding bookmark:', error),
+        error: (error) => console.error('Error Adding Bookmark:', error),
       });
     }
   }
@@ -158,7 +158,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) =>
-          console.error('Error removing from watchlist:', error),
+          console.error('Error Removing From Watchlist:', error),
       });
     } else {
       this.showService.addToWatchlist(show).subscribe({
@@ -171,7 +171,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
             };
           }
         },
-        error: (error) => console.error('Error adding to watchlist:', error),
+        error: (error) => console.error('Error Adding To Watchlist:', error),
       });
     }
   }

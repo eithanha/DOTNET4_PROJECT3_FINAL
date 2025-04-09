@@ -60,11 +60,11 @@ namespace PlotPocket.Server.Controllers
             {
 
                 var userCount = await _userManager.Users.CountAsync();
-                return Ok(new { message = "Connection test successful", userCount });
+                return Ok(new { message = "Connection Test Successful", userCount });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Connection test failed", message = ex.Message });
+                return StatusCode(500, new { error = "Connection Test Failed", message = ex.Message });
             }
         }
 
@@ -77,7 +77,7 @@ namespace PlotPocket.Server.Controllers
 
             if (user == null)
             {
-                return BadRequest("Invalid email or password");
+                return BadRequest("Invalid Email Or Password");
             }
 
 
@@ -85,7 +85,7 @@ namespace PlotPocket.Server.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest("Invalid email or password");
+                return BadRequest("Invalid Email Or Password");
             }
 
 

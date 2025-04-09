@@ -27,7 +27,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -41,7 +41,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -55,7 +55,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -64,7 +64,7 @@ namespace PlotPocket.Server.Controllers
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                return BadRequest("Search query cannot be empty");
+                return BadRequest("Search Query Cannot Be Empty");
             }
 
             try
@@ -74,7 +74,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -87,7 +87,7 @@ namespace PlotPocket.Server.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized("User Not Authenticated");
                 }
 
                 var show = await _showService.AddBookmarkAsync(showId, userId);
@@ -95,7 +95,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -108,7 +108,7 @@ namespace PlotPocket.Server.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized("User Not Authenticated");
                 }
 
                 var show = await _showService.RemoveBookmarkAsync(showId, userId);
@@ -116,7 +116,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
 
@@ -129,7 +129,7 @@ namespace PlotPocket.Server.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized("User Not Authenticated");
                 }
 
                 var bookmarks = await _showService.GetBookmarksAsync(userId);
@@ -137,7 +137,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
     }

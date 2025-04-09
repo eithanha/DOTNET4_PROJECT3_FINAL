@@ -24,11 +24,11 @@ namespace PlotPocket.Server.Controllers
                 var client = new HttpClient();
                 var response = await client.GetAsync("https://api.themoviedb.org/3/configuration?api_key=85063218333c20a38e3fc6f6c4daf5f9");
                 response.EnsureSuccessStatusCode();
-                return Ok("TMDB API is accessible");
+                return Ok("TMDB API Is Accessible");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Connection test failed", message = ex.Message });
+                return StatusCode(500, new { error = "Connection Test Failed", message = ex.Message });
             }
         }
 
@@ -42,19 +42,19 @@ namespace PlotPocket.Server.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                Console.WriteLine($"InvalidOperationException in GetTrendingAll: {ex.Message}");
-                return StatusCode(500, new { error = "Configuration error", message = ex.Message });
+                Console.WriteLine($"InvalidOperationException In GetTrendingAll: {ex.Message}");
+                return StatusCode(500, new { error = "Configuration Error", message = ex.Message });
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"HttpRequestException in GetTrendingAll: {ex.Message}");
-                return StatusCode(500, new { error = "API request failed", message = ex.Message });
+                Console.WriteLine($"HttpRequestException In GetTrendingAll: {ex.Message}");
+                return StatusCode(500, new { error = "API Request Failed", message = ex.Message });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unexpected error in GetTrendingAll: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+                Console.WriteLine($"Unexpected Error In GetTrendingAll: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Internal Server Error", message = ex.Message });
             }
         }
 
@@ -68,7 +68,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching trending movies: {ex.Message}");
+                return StatusCode(500, $"Error Fetching Trending Movies: {ex.Message}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching trending TV shows: {ex.Message}");
+                return StatusCode(500, $"Error Fetching Trending TV Shows: {ex.Message}");
             }
         }
 
@@ -93,7 +93,7 @@ namespace PlotPocket.Server.Controllers
             {
                 if (string.IsNullOrWhiteSpace(query))
                 {
-                    return BadRequest("Search query cannot be empty");
+                    return BadRequest("Search Query Cannot Be Empty");
                 }
 
                 var results = await _showService.SearchShows(query);
@@ -101,7 +101,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error searching shows: {ex.Message}");
+                return StatusCode(500, $"Error Searching Shows: {ex.Message}");
             }
         }
     }

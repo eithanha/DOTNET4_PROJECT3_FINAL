@@ -35,17 +35,17 @@ export class RegistrationComponent implements OnInit {
 
   register() {
     if (!this.email || !this.password || !this.confirmPassword) {
-      this.errorMessage = 'Please fill in all fields';
+      this.errorMessage = 'Please Fill In All Fields';
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match';
+      this.errorMessage = 'Passwords Do Not Match';
       return;
     }
 
     if (this.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters long';
+      this.errorMessage = 'Password Must Be At Least 6 Characters Long';
       return;
     }
 
@@ -58,7 +58,7 @@ export class RegistrationComponent implements OnInit {
       next: () => {
         Swal.fire({
           title: 'Registration Successful!',
-          text: 'You can now log in.',
+          text: 'You Can Now Log In.',
           icon: 'success',
           confirmButtonText: 'OK',
         });
@@ -66,7 +66,7 @@ export class RegistrationComponent implements OnInit {
       },
       error: (error) => {
         console.error('Registration error:', error);
-        let errorMessage = 'An unknown error occurred. Please try again.';
+        let errorMessage = 'An Unknown Error Occurred. Please Try Again.';
 
         if (error.error && typeof error.error === 'string') {
           errorMessage = error.error;

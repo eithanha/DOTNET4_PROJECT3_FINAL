@@ -6,13 +6,13 @@ using PlotPocket.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Configure Identity
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -25,14 +25,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure cookie policy
+
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => false;
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
-// Configure authentication cookies
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -40,7 +40,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.None;
 });
 
-// Configure session cookies
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(1);
@@ -51,12 +51,11 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-// Add API controllers
+
 builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDev",
@@ -70,7 +69,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add distributed memory cache for session support
+
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSingleton<TMDBService>();
@@ -78,7 +77,7 @@ builder.Services.AddScoped<ShowService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -93,18 +92,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// Use CORS - important to place this before auth middleware
+
 app.UseCors("AllowAngularDev");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Use cookie policy
+
 app.UseCookiePolicy();
 
 app.UseSession();
 
-// Map API controllers
+
 app.MapControllers();
 
 app.Run();

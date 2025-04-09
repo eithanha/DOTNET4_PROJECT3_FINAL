@@ -19,7 +19,7 @@ export class NavigationComponent {
         this.router.navigate(['/']);
       },
       error: (error) => {
-        console.error('Error during logout:', error);
+        console.error('Error During Logout:', error);
 
         this.router.navigate(['/']);
       },

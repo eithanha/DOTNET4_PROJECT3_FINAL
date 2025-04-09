@@ -108,17 +108,19 @@ export class AuthService {
     this.get<User>(`${this.apiUrl}/status`)
       .pipe(
         tap((user) => {
-          this.userSubject.next(user);
+          if (user) {
+            this.userSubject.next(user);
+          } else {
+            this.clearFrontendCredentials();
+          }
         }),
         catchError((error) => {
-          if (error.status === 401) {
+          if (error.status === 401 || error.status === 403) {
             this.clearFrontendCredentials();
-            return new Observable<User | null>((subscriber) => {
-              subscriber.next(null);
-              subscriber.complete();
+            this.router.navigate(['/login'], {
+              queryParams: { returnUrl: this.router.url },
             });
           }
-
           return throwError(() => error);
         })
       )

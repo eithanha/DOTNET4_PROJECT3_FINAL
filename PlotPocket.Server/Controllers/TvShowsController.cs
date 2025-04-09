@@ -50,7 +50,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching popular TV shows: {ex.Message}");
+                return StatusCode(500, $"Error Fetching Popular TV Shows: {ex.Message}");
             }
         }
 
@@ -85,7 +85,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching top-rated TV shows: {ex.Message}");
+                return StatusCode(500, $"Error Fetching Top-Rated TV Shows: {ex.Message}");
             }
         }
 
@@ -120,7 +120,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching on-air TV shows: {ex.Message}");
+                return StatusCode(500, $"Error Fetching On-Air TV Shows: {ex.Message}");
             }
         }
 
@@ -129,7 +129,7 @@ namespace PlotPocket.Server.Controllers
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                return BadRequest("Search query cannot be empty");
+                return BadRequest("Search Query Cannot Be Empty");
             }
 
             try
@@ -141,7 +141,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error searching TV shows: {ex.Message}");
+                return StatusCode(500, $"Error Searching TV Shows: {ex.Message}");
             }
         }
 
@@ -162,7 +162,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error adding TV show to watchlist: {ex.Message}");
+                return StatusCode(500, $"Error Adding TV Show To Watchlist: {ex.Message}");
             }
         }
 
@@ -183,7 +183,7 @@ namespace PlotPocket.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error removing TV show from watchlist: {ex.Message}");
+                return StatusCode(500, $"Error Removing TV Show From Watchlist: {ex.Message}");
             }
         }
     }

@@ -38,7 +38,7 @@ public class TMDBService
         var response = await _client.ExecuteGetAsync(request);
         var result = JsonSerializer.Deserialize<TrendingResponse>(response.Content);
         
-        // Update poster paths to use consistent size
+        
         if (result?.Results != null)
         {
             foreach (var item in result.Results)
@@ -90,7 +90,7 @@ public class TMDBService
 
     public async Task<ApiMediaItem> GetShowDetailsAsync(int showId)
     {
-        // Try to get movie details first
+       
         var movieRequest = new RestRequest($"/movie/{showId}");
         movieRequest.AddParameter("api_key", _apiKey);
         movieRequest.AddHeader("accept", "application/json");
@@ -106,7 +106,7 @@ public class TMDBService
             }
         }
 
-        // If movie not found, try TV show
+        
         var tvRequest = new RestRequest($"/tv/{showId}");
         tvRequest.AddParameter("api_key", _apiKey);
         tvRequest.AddHeader("accept", "application/json");
@@ -119,10 +119,10 @@ public class TMDBService
             return tvShow;
         }
 
-        throw new InvalidOperationException($"Show with ID {showId} not found");
+        throw new InvalidOperationException($"Show With ID {showId} Not Found");
     }
 
-    // Movie Endpoints
+   
     public async Task<MovieResponse> GetNowPlayingMoviesAsync(int page = 1)
     {
         var request = new RestRequest($"/movie/now_playing?api_key={_apiKey}&page={page}")
@@ -147,7 +147,7 @@ public class TMDBService
         {
             if (string.IsNullOrEmpty(_apiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var request = new RestRequest($"/movie/popular?api_key={_apiKey}&page={page}")
@@ -156,31 +156,31 @@ public class TMDBService
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
-                throw new HttpRequestException($"TMDB API request failed with status code: {response.StatusCode}");
+                throw new HttpRequestException($"TMDB API Request Failed With Status Code: {response.StatusCode}");
             }
 
             if (string.IsNullOrEmpty(response.Content))
             {
-                throw new InvalidOperationException("Empty response received from TMDB API");
+                throw new InvalidOperationException("Empty Response Received From TMDB API");
             }
 
             var movieResponse = JsonSerializer.Deserialize<MovieResponse>(response.Content);
             if (movieResponse == null)
             {
-                throw new InvalidOperationException("Failed to deserialize TMDB API response");
+                throw new InvalidOperationException("Failed To Deserialize TMDB API Response");
             }
 
             return movieResponse;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetPopularMoviesAsync: {ex.Message}");
+            Console.WriteLine($"Error In GetPopularMoviesAsync: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
             throw;
         }
     }
 
-    // TV Show Endpoints
+    
     public async Task<TvShowResponse> GetAiringTodayTvShowsAsync(int page = 1)
     {
         var request = new RestRequest($"/tv/airing_today?api_key={_apiKey}&page={page}")
@@ -205,7 +205,7 @@ public class TMDBService
         {
             if (string.IsNullOrEmpty(_apiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var request = new RestRequest($"/tv/popular?api_key={_apiKey}&page={page}")
@@ -214,26 +214,26 @@ public class TMDBService
             var response = await _client.GetAsync(request);
             if (!response.IsSuccessful)
             {
-                throw new HttpRequestException($"TMDB API request failed with status code: {response.StatusCode}");
+                throw new HttpRequestException($"TMDB API Request Failed With Status Code: {response.StatusCode}");
             }
 
             if (string.IsNullOrEmpty(response.Content))
             {
-                throw new InvalidOperationException("Empty response received from TMDB API");
+                throw new InvalidOperationException("Empty Response Received From TMDB API");
             }
 
             var tvShowResponse = JsonSerializer.Deserialize<TvShowResponse>(response.Content);
             if (tvShowResponse == null)
             {
-                throw new InvalidOperationException("Failed to deserialize TMDB API response");
+                throw new InvalidOperationException("Failed To Deserialize TMDB API Response");
             }
 
             return tvShowResponse;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetPopularTvShowsAsync: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In GetPopularTvShowsAsync: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }

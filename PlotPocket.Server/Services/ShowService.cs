@@ -161,11 +161,11 @@ public class ShowService
         {
             if (string.IsNullOrEmpty(_tmdbApiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var url = $"{_tmdbBaseUrl}/trending/all/day?api_key={_tmdbApiKey}";
-            Console.WriteLine($"Making request to TMDB: {url}");
+            Console.WriteLine($"Making Request To TMDB: {url}");
 
 
             int maxRetries = 3;
@@ -178,12 +178,12 @@ public class ShowService
                     response.EnsureSuccessStatusCode();
 
                     var content = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"TMDB Response received successfully");
+                    Console.WriteLine($"TMDB Response Received Successfully");
 
                     var trendingResponse = JsonSerializer.Deserialize<TrendingResponse>(content);
                     if (trendingResponse?.Results == null)
                     {
-                        throw new InvalidOperationException("Invalid response from TMDB API");
+                        throw new InvalidOperationException("Invalid Response From TMDB API");
                     }
 
                     return trendingResponse.Results.Select(item => MediaItemToShowDto(item, null)).ToList();
@@ -191,22 +191,22 @@ public class ShowService
                 catch (HttpRequestException ex) when (currentRetry < maxRetries - 1)
                 {
                     currentRetry++;
-                    Console.WriteLine($"Attempt {currentRetry} failed: {ex.Message}");
+                    Console.WriteLine($"Attempt {currentRetry} Failed: {ex.Message}");
                     await Task.Delay(1000 * currentRetry);
                     continue;
                 }
                 catch (HttpRequestException ex)
                 {
-                    throw new HttpRequestException($"Failed to connect to TMDB API after {maxRetries} attempts. Please check your internet connection and DNS settings.", ex);
+                    throw new HttpRequestException($"Failed To Connect To TMDB API After {maxRetries} Attempts. Please Check Your Internet Connection And DNS Settings.", ex);
                 }
             }
 
-            throw new InvalidOperationException("Failed to get trending shows after multiple attempts");
+            throw new InvalidOperationException("Failed To Get Trending Shows After Multiple Attempts");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error in GetTrendingShows: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -240,7 +240,7 @@ public class ShowService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error getting show details for showId {id}: {ex.Message}");
+            Console.WriteLine($"Error Getting Show Details For ShowId {id}: {ex.Message}");
             throw;
         }
     }
@@ -333,7 +333,7 @@ public class ShowService
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException("User not found");
+            throw new InvalidOperationException("User Not Found");
         }
 
         if (!show.Users.Contains(user))
@@ -353,13 +353,13 @@ public class ShowService
 
         if (show == null)
         {
-            throw new InvalidOperationException("Show not found");
+            throw new InvalidOperationException("Show Not Found");
         }
 
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException("User not found");
+            throw new InvalidOperationException("User Not Found");
         }
 
         show.Users.Remove(user);
@@ -394,8 +394,8 @@ public class ShowService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in SearchShows: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In SearchShows: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -406,11 +406,11 @@ public class ShowService
         {
             if (string.IsNullOrEmpty(_tmdbApiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var url = $"{_tmdbBaseUrl}/tv/popular?api_key={_tmdbApiKey}";
-            Console.WriteLine($"Making request to TMDB: {url}");
+            Console.WriteLine($"Making Request To TMDB: {url}");
 
 
             int maxRetries = 3;
@@ -423,12 +423,12 @@ public class ShowService
                     response.EnsureSuccessStatusCode();
 
                     var content = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"TMDB Response received successfully");
+                    Console.WriteLine($"TMDB Response Received Successfully");
 
                     var tvShowResponse = JsonSerializer.Deserialize<TvShowResponse>(content);
                     if (tvShowResponse?.Results == null)
                     {
-                        throw new InvalidOperationException("Invalid response from TMDB API");
+                        throw new InvalidOperationException("Invalid Response From TMDB API");
                     }
 
                     return tvShowResponse.Results.Select(item => TvShowToShowDto(item)).ToList();
@@ -436,22 +436,22 @@ public class ShowService
                 catch (HttpRequestException ex) when (currentRetry < maxRetries - 1)
                 {
                     currentRetry++;
-                    Console.WriteLine($"Attempt {currentRetry} failed: {ex.Message}");
-                    await Task.Delay(1000 * currentRetry); // Exponential backoff
+                    Console.WriteLine($"Attempt {currentRetry} Failed: {ex.Message}");
+                    await Task.Delay(1000 * currentRetry); 
                     continue;
                 }
                 catch (HttpRequestException ex)
                 {
-                    throw new HttpRequestException($"Failed to connect to TMDB API after {maxRetries} attempts. Please check your internet connection and DNS settings.", ex);
+                    throw new HttpRequestException($"Failed To Connect To TMDB API After {maxRetries} Attempts. Please Check Your Internet Connection And DNS Settings.", ex);
                 }
             }
 
-            throw new InvalidOperationException("Failed to get popular TV shows after multiple attempts");
+            throw new InvalidOperationException("Failed To Get Popular TV Shows After Multiple Attempts");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetPopularTvShows: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In GetPopularTvShows: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -462,11 +462,11 @@ public class ShowService
         {
             if (string.IsNullOrEmpty(_tmdbApiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var url = $"{_tmdbBaseUrl}/tv/top_rated?api_key={_tmdbApiKey}";
-            Console.WriteLine($"Making request to TMDB: {url}");
+            Console.WriteLine($"Making Request To TMDB: {url}");
 
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -478,8 +478,8 @@ public class ShowService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetTopRatedTvShows: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In GetTopRatedTvShows: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -490,11 +490,11 @@ public class ShowService
         {
             if (string.IsNullOrEmpty(_tmdbApiKey))
             {
-                throw new InvalidOperationException("TMDB API key is not configured");
+                throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
             var url = $"{_tmdbBaseUrl}/tv/on_the_air?api_key={_tmdbApiKey}";
-            Console.WriteLine($"Making request to TMDB: {url}");
+            Console.WriteLine($"Making Request To TMDB: {url}");
 
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -506,8 +506,8 @@ public class ShowService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetOnAirTvShows: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In GetOnAirTvShows: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -540,7 +540,7 @@ public class ShowService
     {
         try
         {
-            Console.WriteLine($"Adding bookmark for show {showId} and user {userId}");
+            Console.WriteLine($"Adding Bookmark For Show {showId} And User {userId}");
 
 
             var existingBookmark = await _context.Bookmarks
@@ -548,7 +548,7 @@ public class ShowService
 
             if (existingBookmark != null)
             {
-                Console.WriteLine($"Bookmark already exists for show {showId}");
+                Console.WriteLine($"Bookmark Already Exists For Show {showId}");
 
                 try
                 {
@@ -562,7 +562,7 @@ public class ShowService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error getting show details for existing bookmark: {ex.Message}");
+                    Console.WriteLine($"Error Getting Show Details For Existing Bookmark: {ex.Message}");
 
                     return new ShowDto
                     {
@@ -582,7 +582,7 @@ public class ShowService
 
             _context.Bookmarks.Add(bookmark);
             await _context.SaveChangesAsync();
-            Console.WriteLine($"Created new bookmark for show {showId}");
+            Console.WriteLine($"Created New Bookmark For Show {showId}");
 
 
             try
@@ -597,7 +597,7 @@ public class ShowService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting show details for new bookmark: {ex.Message}");
+                Console.WriteLine($"Error Getting Show Details For New Bookmark: {ex.Message}");
 
                 return new ShowDto
                 {
@@ -607,12 +607,12 @@ public class ShowService
             }
 
 
-            throw new Exception($"Failed to get show details for show {showId}");
+            throw new Exception($"Failed To Get Show Details For Show {showId}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in AddBookmarkAsync: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In AddBookmarkAsync: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }
@@ -644,14 +644,14 @@ public class ShowService
                 .Select(b => b.ShowId)
                 .ToListAsync();
 
-            Console.WriteLine($"Found {bookmarkedShowIds.Count} bookmarks for user {userId}");
+            Console.WriteLine($"Found {bookmarkedShowIds.Count} Bookmarks For User {userId}");
 
             var shows = new List<ShowDto>();
             foreach (var showId in bookmarkedShowIds)
             {
                 try
                 {
-                    Console.WriteLine($"Getting details for show {showId}");
+                    Console.WriteLine($"Getting Details For Show {showId}");
                     var show = await _tmdbService.GetShowDetailsAsync(showId);
                     if (show != null)
                     {
@@ -662,7 +662,7 @@ public class ShowService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error getting show details for showId {showId}: {ex.Message}");
+                    Console.WriteLine($"Error Getting Show Details For ShowId {showId}: {ex.Message}");
 
                     continue;
                 }
@@ -672,8 +672,8 @@ public class ShowService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetBookmarksAsync: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error In GetBookmarksAsync: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }

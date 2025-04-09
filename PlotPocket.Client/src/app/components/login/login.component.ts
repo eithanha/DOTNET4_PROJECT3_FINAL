@@ -26,7 +26,7 @@ export class LoginComponent {
 
   login() {
     if (!this.email || !this.password) {
-      this.errorMessage = 'Please enter your email and password';
+      this.errorMessage = 'Please Enter Your Email And Password';
       return;
     }
 
@@ -40,8 +40,8 @@ export class LoginComponent {
         this.router.navigate(['/']);
       },
       error: (error: Error) => {
-        this.errorMessage = 'Invalid email or password';
-        console.error('Login error:', error);
+        this.errorMessage = 'Invalid Email Or Password';
+        console.error('Login Error:', error);
       },
     });
   }
