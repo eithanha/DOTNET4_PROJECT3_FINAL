@@ -164,7 +164,7 @@ public class ShowService
                 throw new InvalidOperationException("TMDB API Key Is Not Configured");
             }
 
-            var url = $"{_tmdbBaseUrl}/trending/all/day?api_key={_tmdbApiKey}";
+            var url = $"{_tmdbBaseUrl}/trending/all/api_key={_tmdbApiKey}";
             Console.WriteLine($"Making Request To TMDB: {url}");
 
 
@@ -213,7 +213,7 @@ public class ShowService
 
     public async Task<List<ShowDto>> GetTrendingMovies()
     {
-        var response = await _httpClient.GetAsync($"{_tmdbBaseUrl}/trending/movie/day?api_key={_tmdbApiKey}");
+        var response = await _httpClient.GetAsync($"{_tmdbBaseUrl}/trending/movie/api_key={_tmdbApiKey}");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         var trendingResponse = JsonSerializer.Deserialize<TrendingResponse>(content);
@@ -223,7 +223,7 @@ public class ShowService
 
     public async Task<List<ShowDto>> GetTrendingTvShows()
     {
-        var response = await _httpClient.GetAsync($"{_tmdbBaseUrl}/trending/tv/day?api_key={_tmdbApiKey}");
+        var response = await _httpClient.GetAsync($"{_tmdbBaseUrl}/trending/tv/api_key={_tmdbApiKey}");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         var trendingResponse = JsonSerializer.Deserialize<TrendingResponse>(content);
