@@ -125,7 +125,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
             };
           }
         },
-        error: (error) => console.error('Error removing bookmark:', error),
+        error: (error) => console.error('Error Removing Bookmark:', error),
       });
     } else {
       this.bookmarkService.addBookmark(show).subscribe({
@@ -135,7 +135,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
             this.tvShows[index] = updatedShow;
           }
         },
-        error: (error) => console.error('Error adding bookmark:', error),
+        error: (error) => console.error('Error Adding Bookmark:', error),
       });
     }
   }
@@ -158,7 +158,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) =>
-          console.error('Error removing from watchlist:', error),
+          console.error('Error Removing From Watchlist:', error),
       });
     } else {
       this.showService.addToWatchlist(show).subscribe({
@@ -171,7 +171,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
             };
           }
         },
-        error: (error) => console.error('Error adding to watchlist:', error),
+        error: (error) => console.error('Error Adding To Watchlist:', error),
       });
     }
   }

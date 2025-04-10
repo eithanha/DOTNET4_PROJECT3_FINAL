@@ -71,8 +71,8 @@ export class TrendingComponent implements OnInit, OnDestroy {
           this.error = null;
         },
         error: (err) => {
-          console.error('Error searching shows:', err);
-          this.error = 'Failed to search shows. Please try again later.';
+          console.error('Error Searching Shows:', err);
+          this.error = 'Failed To Search Shows. Please Try Again Later.';
           this.loading = false;
         },
       });
@@ -148,7 +148,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
             };
           }
         },
-        error: (error) => console.error('Error removing bookmark:', error),
+        error: (error) => console.error('Error Removing Bookmark:', error),
       });
     } else {
       this.bookmarkService.addBookmark(show).subscribe({
@@ -158,7 +158,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
             this.trendingShows[index] = updatedShow;
           }
         },
-        error: (error) => console.error('Error adding bookmark:', error),
+        error: (error) => console.error('Error Adding Bookmark:', error),
       });
     }
   }
@@ -169,8 +169,8 @@ export class TrendingComponent implements OnInit, OnDestroy {
         show.isWatchlisted = true;
       },
       error: (err) => {
-        console.error('Error adding to watchlist:', err);
-        this.error = 'Failed to add show to watchlist';
+        console.error('Error Adding To Watchlist:', err);
+        this.error = 'Failed To Add Show To Watchlist';
       },
     });
   }
@@ -181,8 +181,8 @@ export class TrendingComponent implements OnInit, OnDestroy {
         show.isWatchlisted = false;
       },
       error: (err) => {
-        console.error('Error removing from watchlist:', err);
-        this.error = 'Failed to remove show from watchlist';
+        console.error('Error Removing From Watchlist:', err);
+        this.error = 'Failed To Remove Show From Watchlist';
       },
     });
   }
