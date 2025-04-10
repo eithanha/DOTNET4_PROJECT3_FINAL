@@ -10,6 +10,7 @@ import {
   distinctUntilChanged,
   switchMap,
   map,
+  Observable,
 } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -30,6 +31,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
+  //shows!: ShowDto[];
 
   constructor(
     private showService: ShowService,
@@ -84,8 +86,19 @@ export class TrendingComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.showService
-      .getTrendingShows()
+    let request$: Observable<ShowDto[]>;
+    switch (this.selectedFilter) {
+      case 'movies':
+        request$ = this.showService.getTrendingMovies();
+        break;
+      case 'tv-shows':
+        request$ = this.showService.getTrendingTvShows();
+        break;
+      default:
+        request$ = this.showService.getTrendingShows();
+    }
+
+    request$
       .pipe(
         map((shows) => this.bookmarkService.updateShowsBookmarkStatus(shows)),
         takeUntil(this.destroy$)
@@ -96,8 +109,8 @@ export class TrendingComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading trending shows:', error);
-          this.error = 'Failed to load trending shows. Please try again later.';
+          console.error('Error Loading Trending Shows:', error);
+          this.error = 'Failed To Load Trending Shows. Please Try Again Later.';
           this.loading = false;
         },
       });

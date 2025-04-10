@@ -68,8 +68,8 @@ export class TvShowsComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading TV shows:', error);
-          this.error = 'Failed to load TV shows. Please try again later.';
+          console.error('Error Loading TV Shows:', error);
+          this.error = 'Failed To Load TV Shows. Please Try Again Later.';
           this.loading = false;
         },
       });
