@@ -8,7 +8,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BookmarkService } from '../../services/bookmark.service';
 import { Subject, Observable } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  takeUntil,
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-movies',
@@ -22,6 +27,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   searchQuery = '';
+  private searchSubject$ = new Subject<string>();
   selectedFilter: 'popular' | 'now-playing' | 'top-rated' = 'popular';
   private destroy$ = new Subject<void>();
 
@@ -34,6 +40,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMovies();
+    this.setupSearch();
   }
 
   ngOnDestroy(): void {
@@ -75,6 +82,14 @@ export class MoviesComponent implements OnInit, OnDestroy {
       });
   }
 
+  private setupSearch(): void {
+    this.searchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.onSearch();
+      });
+  }
+
   onSearch(): void {
     if (!this.searchQuery.trim()) {
       this.loadMovies();
@@ -85,7 +100,7 @@ export class MoviesComponent implements OnInit, OnDestroy {
     this.error = null;
 
     this.showService
-      .searchShows(this.searchQuery)
+      .searchMovies(this.searchQuery)
       .pipe(
         map((shows) => this.bookmarkService.updateShowsBookmarkStatus(shows)),
         takeUntil(this.destroy$)

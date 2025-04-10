@@ -11,6 +11,7 @@ import {
   switchMap,
   map,
   Observable,
+  of,
 } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -58,10 +59,18 @@ export class TrendingComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         switchMap((query) => {
           if (!query.trim()) {
-            return this.showService.getTrendingShows();
+            this.loadTrendingShows();
+            return of([]);
           }
           this.loading = true;
-          return this.showService.searchShows(query);
+          switch (this.selectedFilter) {
+            case 'movies':
+              return this.showService.searchMovies(query);
+            case 'tv-shows':
+              return this.showService.searchTvShows(query);
+            default:
+              return this.showService.searchShows(query);
+          }
         })
       )
       .subscribe({

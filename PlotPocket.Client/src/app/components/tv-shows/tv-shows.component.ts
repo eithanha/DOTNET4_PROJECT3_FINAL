@@ -85,7 +85,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
     this.error = null;
 
     this.showService
-      .searchShows(this.searchQuery)
+      .searchTvShows(this.searchQuery)
       .pipe(
         map((shows) => this.bookmarkService.updateShowsBookmarkStatus(shows)),
         takeUntil(this.destroy$)

@@ -94,7 +94,8 @@ public class ShowService
             PosterPath = posterPath,
             Rating = mediaItem.VoteAverage,
             IsWatchlisted = userId != null && IsShowInUserWatchlist(mediaItem.Id, userId),
-            IsWatched = userId != null && IsShowWatchedByUser(mediaItem.Id, userId)
+            IsWatched = userId != null && IsShowWatchedByUser(mediaItem.Id, userId),
+            IsBookmarked = userId != null && IsShowBookmarkedByUser(mediaItem.Id, userId)
         };
     }
 
@@ -153,6 +154,11 @@ public class ShowService
         return _context.Set<Show>()
             .Include(s => s.Users)
             .Any(s => s.ShowApiId == showId && s.Users.Any(u => u.Id == userId) && s.Watched);
+    }
+
+    private bool IsShowBookmarkedByUser(int showId, string userId)
+    {
+        return _context.Bookmarks.Any(b => b.ShowId == showId && b.UserId == userId);
     }
 
     public async Task<List<ShowDto>> GetTrendingShows()
@@ -638,7 +644,6 @@ public class ShowService
     {
         try
         {
-
             var bookmarkedShowIds = await _context.Bookmarks
                 .Where(b => b.UserId == userId)
                 .Select(b => b.ShowId)
@@ -646,34 +651,27 @@ public class ShowService
 
             Console.WriteLine($"Found {bookmarkedShowIds.Count} Bookmarks For User {userId}");
 
-            var shows = new List<ShowDto>();
+            var bookmarks = new List<ShowDto>();
             foreach (var showId in bookmarkedShowIds)
             {
                 try
                 {
-                    Console.WriteLine($"Getting Details For Show {showId}");
-                    var show = await _tmdbService.GetShowDetailsAsync(showId);
-                    if (show != null)
-                    {
-                        var showDto = MediaItemToShowDto(show, userId);
-                        showDto.IsBookmarked = true;
-                        shows.Add(showDto);
-                    }
+                    var mediaItem = await _tmdbService.GetShowDetailsAsync(showId);
+                    var showDto = MediaItemToShowDto(mediaItem, userId);
+                    showDto.IsBookmarked = true;
+                    bookmarks.Add(showDto);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Getting Show Details For ShowId {showId}: {ex.Message}");
-
-                    continue;
+                    Console.WriteLine($"Error getting show details for showId {showId}: {ex.Message}");
                 }
             }
 
-            return shows;
+            return bookmarks;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error In GetBookmarksAsync: {ex.Message}");
-            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             throw;
         }
     }

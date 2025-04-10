@@ -33,7 +33,14 @@ export class BookmarkService {
     private router: Router
   ) {
     this.bookmarks$ = this.bookmarksSubject.asObservable().pipe(shareReplay(1));
-    this.loadBookmarks();
+
+    this.authService.getCurrentUser().subscribe((user) => {
+      if (user) {
+        this.loadBookmarks();
+      } else {
+        this.clearBookmarks();
+      }
+    });
   }
 
   private getHeaders(): HttpHeaders {
@@ -44,7 +51,6 @@ export class BookmarkService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     if (error.status === 401 || error.status === 403) {
-      //this.authService.clearFrontendCredentials();
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: this.router.url },
       });
@@ -100,6 +106,11 @@ export class BookmarkService {
     return this.bookmarks$;
   }
 
+  private clearBookmarks(): void {
+    this.bookmarksSubject.next([]);
+    this.bookmarksCache.clear();
+  }
+
   private loadBookmarks(): void {
     if (this.isLoading) return;
     this.isLoading = true;
@@ -110,6 +121,11 @@ export class BookmarkService {
           this.bookmarksSubject.next(bookmarks);
           this.bookmarksCache = new Set(bookmarks.map((b) => b.id));
           this.isLoading = false;
+        }),
+        catchError((error) => {
+          this.isLoading = false;
+          this.clearBookmarks();
+          return throwError(() => error);
         })
       )
       .subscribe();

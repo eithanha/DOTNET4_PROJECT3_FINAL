@@ -13,7 +13,7 @@ import {
   map,
   throwError,
 } from 'rxjs';
-import { ShowDto } from '../models/show.dto';
+import { ShowDto, ShowType } from '../models/show.dto';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 
@@ -45,7 +45,6 @@ export class ShowService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     if (error.status === 401 || error.status === 403) {
-      //this.authService.clearFrontendCredentials();
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: this.router.url },
       });
@@ -127,6 +126,30 @@ export class ShowService {
     return this.get<ShowDto[]>(`${this.apiUrl}/shows/search`, {
       params: { query },
     }).pipe(timeout(this.TIMEOUT));
+  }
+
+  searchMovies(query: string): Observable<ShowDto[]> {
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/search`, {
+      params: { query },
+    }).pipe(
+      timeout(this.TIMEOUT),
+      map((shows) =>
+        this.transformShows(shows).filter((show) => show.type === 'Movie')
+      )
+    );
+  }
+
+  searchTvShows(query: string): Observable<ShowDto[]> {
+    return this.get<ShowDto[]>(`${this.apiUrl}/shows/search`, {
+      params: { query },
+    }).pipe(
+      timeout(this.TIMEOUT),
+      map((shows) =>
+        this.transformShows(shows).filter(
+          (show) => show.type === ShowType.TvShow
+        )
+      )
+    );
   }
 
   getMovies(): Observable<ShowDto[]> {

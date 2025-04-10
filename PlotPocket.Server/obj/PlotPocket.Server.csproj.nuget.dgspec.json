@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ethan\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj": {}
+    "C:\\Users\\xangh\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ethan\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj": {
+    "C:\\Users\\xangh\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ethan\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj",
+        "projectUniqueName": "C:\\Users\\xangh\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj",
         "projectName": "PlotPocket.Server",
-        "projectPath": "C:\\Users\\Ethan\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj",
-        "packagesPath": "C:\\Users\\Ethan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ethan\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\obj\\",
+        "projectPath": "C:\\Users\\xangh\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\PlotPocket.Server.csproj",
+        "packagesPath": "C:\\Users\\xangh\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\xangh\\Desktop\\DOTNET4_PROJECT3_FINAL\\PlotPocket.Server\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Ethan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\xangh\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -104,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
