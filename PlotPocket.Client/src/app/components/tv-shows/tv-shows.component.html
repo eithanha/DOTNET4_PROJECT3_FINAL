@@ -29,6 +29,15 @@
 
     <div class="flex items-center justify-center mb-8 space-x-4">
       <button
+        (click)="onFilterChange('popular')"
+        [class.bg-blue-600]="selectedFilter === 'popular'"
+        [class.bg-slate-700]="selectedFilter !== 'popular'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
+      >
+        Popular
+      </button>
+
+      <button
         (click)="onFilterChange('on-air')"
         [class.bg-blue-600]="selectedFilter === 'on-air'"
         [class.bg-slate-700]="selectedFilter !== 'on-air'"
@@ -36,6 +45,7 @@
       >
         Airing Today
       </button>
+
       <button
         (click)="onFilterChange('top-rated')"
         [class.bg-blue-600]="selectedFilter === 'top-rated'"
@@ -43,15 +53,6 @@
         class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
       >
         Top Rated
-      </button>
-
-      <button
-        (click)="onFilterChange('popular')"
-        [class.bg-blue-600]="selectedFilter === 'popular'"
-        [class.bg-slate-700]="selectedFilter !== 'popular'"
-        class="px-4 py-2 rounded-lg text-white font-medium transition-colors duration-200 hover:bg-blue-700"
-      >
-        Popular
       </button>
     </div>
 

@@ -47,14 +47,14 @@ export class TvShowsComponent implements OnInit, OnDestroy {
 
     let request$: Observable<ShowDto[]>;
     switch (this.selectedFilter) {
-      case 'on-air':
-        request$ = this.showService.getOnAirTvShows();
+      case 'popular':
+        request$ = this.showService.getPopularTvShows();
         break;
       case 'top-rated':
         request$ = this.showService.getTopRatedTvShows();
         break;
       default:
-        request$ = this.showService.getPopularTvShows();
+        request$ = this.showService.getOnAirTvShows();
     }
 
     request$
@@ -103,7 +103,7 @@ export class TvShowsComponent implements OnInit, OnDestroy {
       });
   }
 
-  onFilterChange(filter: 'popular' | 'top-rated' | 'on-air'): void {
+  onFilterChange(filter: 'on-air' | 'top-rated' | 'popular'): void {
     this.selectedFilter = filter;
     this.loadTvShows();
   }

@@ -47,14 +47,14 @@ export class MoviesComponent implements OnInit, OnDestroy {
 
     let request$: Observable<ShowDto[]>;
     switch (this.selectedFilter) {
-      case 'now-playing':
-        request$ = this.showService.getNowPlayingMovies();
+      case 'popular':
+        request$ = this.showService.getPopularMovies();
         break;
       case 'top-rated':
         request$ = this.showService.getTopRatedMovies();
         break;
       default:
-        request$ = this.showService.getPopularMovies();
+        request$ = this.showService.getNowPlayingMovies();
     }
 
     request$
