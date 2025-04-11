@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PlotPocket.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d692f83f8ca419daf183bba1ca40c6c9f3a2a259")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+71a78fa65a6f3fd2b3679d889a9a32c7d1c8ad28")]
 [assembly: System.Reflection.AssemblyProductAttribute("PlotPocket.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PlotPocket.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
